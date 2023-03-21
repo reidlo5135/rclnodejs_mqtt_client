@@ -28,6 +28,5 @@ async function run() {
 (async function main(): Promise<void> {
   run();
 })().catch((): void => {
-
   process.exitCode = 1
 });
