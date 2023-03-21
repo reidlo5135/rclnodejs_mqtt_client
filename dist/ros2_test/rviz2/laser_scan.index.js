@@ -1,4 +1,5 @@
 "use strict";
+'strict mode';
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -31,38 +32,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const rclnodejs = __importStar(require("rclnodejs"));
-const mqtt_infra_1 = __importDefault(require("./mqtt/mqtt.infra"));
-const odometry_subscriber_1 = __importDefault(require("./ros2/odom/odometry.subscriber"));
-const imu_data_subscriber_1 = __importDefault(require("./ros2/imu/imu_data.subscriber"));
-const robot_pose_subscriber_1 = __importDefault(require("./ros2/robotPose/robot_pose.subscriber"));
-const scan_subscriber_1 = __importDefault(require("./ros2/scan/scan.subscriber"));
-const laser_scan_publisher_1 = require("./ros2/scan/laserScan/laser_scan.publisher");
-const joint_states_publisher_1 = __importDefault(require("./ros2/jointStates/joint_states.publisher"));
-function run() {
+const laser_scan_publisher_test_node_1 = require("./laser_scan.publisher.test.node");
+function main() {
     return __awaiter(this, void 0, void 0, function* () {
         yield rclnodejs.init();
-        const mqtt = new mqtt_infra_1.default();
-        const imuData = new imu_data_subscriber_1.default('/imu/data', 'sensor_msgs/msg/Imu', mqtt);
-        const odom = new odometry_subscriber_1.default('/odom', 'nav_msgs/msg/Odometry', mqtt);
-        const robotPose = new robot_pose_subscriber_1.default('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
-        const scan = new scan_subscriber_1.default('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
-        const laserScanPublisher = new laser_scan_publisher_1.LaserScanPublisher('laser_frame');
-        laserScanPublisher.start();
-        const jointStatesPublisher = new joint_states_publisher_1.default('joint_state', mqtt);
-        jointStatesPublisher.start();
+        let node = new rclnodejs.Node('laserscan_publisher');
+        let publisher = new laser_scan_publisher_test_node_1.LaserScanPublisher(node);
+        node.spin();
+        publisher.start();
     });
 }
 ;
-(function main() {
-    return __awaiter(this, void 0, void 0, function* () {
-        run();
-    });
-})().catch(() => {
-    process.exitCode = 1;
-});
-//# sourceMappingURL=index.js.map
+main();
+//# sourceMappingURL=laser_scan.index.js.map

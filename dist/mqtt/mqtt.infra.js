@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Mqtt = void 0;
 const mqtt_1 = __importDefault(require("mqtt"));
 const common_logger_infra_1 = require("../ros2/common/common_logger.infra");
 const common_node_infra_1 = require("../ros2/common/common_node.infra");
@@ -35,7 +34,7 @@ class Mqtt {
         this.client.publish(topic, message);
     }
     ;
-    subscribeForROSPublisher(topic) {
+    subscribeForROSPublisher(topic, publisher, msg) {
         common_logger_infra_1.log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
         this.client.subscribe(topic, function (err, granted) {
             if (err) {
@@ -47,8 +46,7 @@ class Mqtt {
         });
         this.client.on("message", (topic, message) => {
             common_logger_infra_1.log.info(`MQTT onMessage topic : ${topic}, message : ${message}`);
-            // publish(node('cmd_vel_publisher_test_node'), 'geometry_msgs/msg/Twist', '/cmd_vel', new Mqtt());
-            (0, common_node_infra_1.publish)(topic, message.toString());
+            publisher.publish(msg);
         });
     }
     ;
@@ -64,12 +62,12 @@ class Mqtt {
         });
         this.client.on("message", (topic, message) => {
             common_logger_infra_1.log.info(`MQTT onMessage topic : ${topic}, message :  ${message}`);
-            (0, common_node_infra_1.clientForMap)((0, common_node_infra_1.node)('map_server_map_client_test_node'), 'nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', new Mqtt());
+            (0, common_node_infra_1.clientForMap)('nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', new Mqtt());
             // client(node('static_map_client_test_node'), 'nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/static_map', new Mqtt());
         });
     }
     ;
 }
-exports.Mqtt = Mqtt;
+exports.default = Mqtt;
 ;
 //# sourceMappingURL=mqtt.infra.js.map

@@ -23,16 +23,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientForMap = exports.subscribe = exports.publish = exports.node = void 0;
+exports.clientForMap = exports.subscribe = exports.publish = void 0;
 const rclnodejs = __importStar(require("rclnodejs"));
 const common_logger_infra_1 = require("./common_logger.infra");
-function node(name) {
-    const node = new rclnodejs.Node(name);
-    common_logger_infra_1.log.info(`${name} running...`);
-    return node;
-}
-exports.node = node;
-;
 function publish(topic, type) {
     const topArr = topic.split('/');
     common_logger_infra_1.log.info(`RCL publish message type : ${type}, topic : ${topArr[2]} `);
@@ -53,22 +46,21 @@ function publish(topic, type) {
         effort: [4, 5, 6],
     });
     node.spin();
-    destroyDuplicateNode(node);
 }
 exports.publish = publish;
 ;
 function subscribe(node, type, topic, mqtt) {
     common_logger_infra_1.log.info(`RCL subscription message type : ${type}, topic : ${topic} `);
-    node.createSubscription(type, topic, (msg) => {
-        // log.info(`topic ${topic} result msg : ${JSON.stringify(msg)}`);
+    const subscription = node.createSubscription(type, topic, (msg) => {
         mqtt.publish(`wavem/1${topic}`, JSON.stringify(msg));
     });
-    node.spin();
+    return subscription;
 }
 exports.subscribe = subscribe;
 ;
-function clientForMap(node, msg_type, req_type, service, mqtt) {
+function clientForMap(msg_type, req_type, service, mqtt) {
     common_logger_infra_1.log.info(`RCL clientForMap msg_type : ${msg_type}, service : ${service}`);
+    const node = new rclnodejs.Node('map_server_map_client_test');
     const client = node.createClient(msg_type, service);
     const request = rclnodejs.createMessageObject(req_type);
     client.waitForService(1000).then((result) => {
@@ -80,11 +72,8 @@ function clientForMap(node, msg_type, req_type, service, mqtt) {
         ;
         common_logger_infra_1.log.info(`[INFO] sending to ${service} with ${typeof request}`, request);
         client.sendRequest(request, (response) => {
-            // log.info(`[INFO] ${service} service call response result : ${typeof response}`, response);
             common_logger_infra_1.log.info(`${service} service call is null? `, response === null);
             const buffer = Buffer.from(response.map.data);
-            // const buffer = response.map.data;
-            // log.info(`[INFO] ${service} buffer : ` , buffer);
             const bmpData = {
                 width: response.map.info.width,
                 height: response.map.info.height

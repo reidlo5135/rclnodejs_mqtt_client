@@ -1,12 +1,13 @@
 import mqtt from 'mqtt';
+import * as rclnodejs from 'rclnodejs';
 import { log } from '../ros2/common/common_logger.infra';
-import { clientForMap, node, publish } from '../ros2/common/common_node.infra';
+import { clientForMap, publish } from '../ros2/common/common_node.infra';
 
 /**
  * Class for MQTT Connections
  * @see Mqtt
  */
-export class Mqtt {
+export default class Mqtt {
     url;
     client;
 
@@ -33,7 +34,7 @@ export class Mqtt {
         this.client.publish(topic, message);
     };
 
-    public subscribeForROSPublisher(topic: string) {
+    public subscribeForROSPublisher(topic: string, publisher: rclnodejs.Publisher<any>, msg:any) {
         log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
         this.client.subscribe(topic, function(err, granted) {
             if (err) {
@@ -47,8 +48,7 @@ export class Mqtt {
 
         this.client.on("message", (topic, message) => {
             log.info(`MQTT onMessage topic : ${topic}, message : ${message}`);
-            // publish(node('cmd_vel_publisher_test_node'), 'geometry_msgs/msg/Twist', '/cmd_vel', new Mqtt());
-            publish(topic, message.toString());
+            publisher.publish(msg);
         });
     };
 
@@ -65,7 +65,7 @@ export class Mqtt {
 
         this.client.on("message", (topic, message) => {
             log.info(`MQTT onMessage topic : ${topic}, message :  ${message}`);
-            clientForMap(node('map_server_map_client_test_node'), 'nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', new Mqtt());
+            clientForMap('nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', new Mqtt());
             // client(node('static_map_client_test_node'), 'nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/static_map', new Mqtt());
         });
     };

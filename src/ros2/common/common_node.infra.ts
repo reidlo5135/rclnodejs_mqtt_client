@@ -1,15 +1,8 @@
 'use strict';
 
 import * as rclnodejs from 'rclnodejs';
-import {log} from './common_logger.infra';
-import { Mqtt } from '../../mqtt/mqtt.infra';
-
-export function node(name:string) {
-    const node = new rclnodejs.Node(name);
-    log.info(`${name} running...`);
-    
-    return node;
-};
+import { log } from './common_logger.infra';
+import Mqtt from '../../mqtt/mqtt.infra';
 
 export function publish(topic:string, type:any) {
     const topArr = topic.split('/');
@@ -33,24 +26,23 @@ export function publish(topic:string, type:any) {
         effort: [4, 5, 6],
     }); 
 
-    node.spin();
-    destroyDuplicateNode(node);    
+    node.spin();  
 };
 
-export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) {
+export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : rclnodejs.Subscription {
     log.info(`RCL subscription message type : ${type}, topic : ${topic} `);
     
-    node.createSubscription(type, topic, (msg) => {
-        // log.info(`topic ${topic} result msg : ${JSON.stringify(msg)}`);
+    const subscription = node.createSubscription(type, topic, (msg) => {
         mqtt.publish(`wavem/1${topic}`, JSON.stringify(msg));
     });
 
-    node.spin();
+    return subscription;
 };
 
-export function clientForMap(node:rclnodejs.Node, msg_type:any, req_type:any, service:string, mqtt:Mqtt) {
+export function clientForMap(msg_type:any, req_type:any, service:string, mqtt:Mqtt) {
     log.info(`RCL clientForMap msg_type : ${msg_type}, service : ${service}`);
     
+    const node = new rclnodejs.Node('map_server_map_client_test');
     const client = node.createClient(msg_type, service);
     const request = rclnodejs.createMessageObject(req_type);
 
@@ -63,12 +55,9 @@ export function clientForMap(node:rclnodejs.Node, msg_type:any, req_type:any, se
 
         log.info(`[INFO] sending to ${service} with ${typeof request}`, request);
         client.sendRequest(request, (response) => {
-            // log.info(`[INFO] ${service} service call response result : ${typeof response}`, response);
             log.info(`${service} service call is null? `, response === null);
             
             const buffer = Buffer.from(response.map.data);
-            // const buffer = response.map.data;
-            // log.info(`[INFO] ${service} buffer : ` , buffer);
 
             const bmpData = {
                 width: response.map.info.width,

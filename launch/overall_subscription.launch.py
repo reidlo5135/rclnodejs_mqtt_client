@@ -14,7 +14,6 @@ def generate_launch_description():
 
     share_directory = get_package_share_directory('ros2_mqtt_client')
 
-	# revise path to your nodejs start file
     start_js_file = os.path.join(
         share_directory,
         'dist',
