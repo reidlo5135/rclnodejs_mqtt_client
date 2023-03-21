@@ -6,8 +6,8 @@
   "author": "",
   "license": "TODO: License declaration",
   "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "main": "nodemon src/index.ts",
+    "build": "tsc"
   },
   "bin": {
     "generate-messages": "node_modules/.bin/generate-ros-messages"
