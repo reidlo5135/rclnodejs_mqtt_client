@@ -47,7 +47,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         yield rclnodejs.init();
         const mqtt = new mqtt_infra_1.default();
-        const imuData = new imu_data_subscriber_1.default(new rclnodejs.Node('data_subscriber', '/imu'), '/imu/data', 'sensor_msgs/msg/Imu', mqtt);
+        const imuData = new imu_data_subscriber_1.default('/imu/data', 'sensor_msgs/msg/Imu', mqtt);
         const odom = new odometry_subscriber_1.default('/odom', 'nav_msgs/msg/Odometry', mqtt);
         const robotPose = new robot_pose_subscriber_1.default('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
         const scan = new scan_subscriber_1.default('/scan', 'sensor_msgs/msg/LaserScan', mqtt);

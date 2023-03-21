@@ -20,7 +20,6 @@ def generate_launch_description():
         'index.js')
 
     start_javascript_node = Node(
-        name='overall_subscriber',
         executable='node',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
