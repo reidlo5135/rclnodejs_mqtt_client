@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/Node.ts-339933?style=for-the-badge&logo=Node.js&logoColor=white">
 <img src="https://img.shields.io/badge/NodeMon-76D04B?style=for-the-badge&logo=NodeMon&logoColor=white">
 <img src="https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=Npm&logoColor=white">
+<img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=Python&logoColor=white">
 <img src="https://img.shields.io/badge/ROS2-22314E?style=for-the-badge&logo=ros&logoColor=white">
 <img src="https://img.shields.io/badge/Cmake-064F8C?style=for-the-badge&logo=CMake&logoColor=white">
 <img src="https://img.shields.io/badge/mqtt-660066?style=for-the-badge&logo=mqtt&logoColor=white"><br>
