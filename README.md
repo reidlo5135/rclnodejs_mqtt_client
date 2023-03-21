@@ -4,7 +4,7 @@
 ## <b>사용기술</b>
 <span>
 <img src="https://img.shields.io/badge/Typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
-<img src="https://img.shields.io/badge/Node.ts-339933?style=for-the-badge&logo=Node.ts&logoColor=white">
+<img src="https://img.shields.io/badge/Node.ts-339933?style=for-the-badge&logo=Node.js&logoColor=white">
 <img src="https://img.shields.io/badge/NodeMon-76D04B?style=for-the-badge&logo=NodeMon&logoColor=white">
 <img src="https://img.shields.io/badge/NPM-CB3837?style=for-the-badge&logo=Npm&logoColor=white">
 <img src="https://img.shields.io/badge/ROS2-22314E?style=for-the-badge&logo=ros&logoColor=white">
