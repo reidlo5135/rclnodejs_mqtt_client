@@ -17,6 +17,3 @@
 
 - Main - Node.ts, NodeMon, Npm, TypeScript, ROS2, MQTT, CMake
 - IDE - Visual Studio Code
-
-
-npx rclnodejs-cli create-package mypkg --typescript
