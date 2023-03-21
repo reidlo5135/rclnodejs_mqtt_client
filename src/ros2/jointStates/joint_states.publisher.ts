@@ -2,7 +2,6 @@
 
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
-import { log } from '../common/common_logger.infra';
 
 export default class JointStatesPublisher {
     private isRunning = false;
