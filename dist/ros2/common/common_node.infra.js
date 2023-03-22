@@ -41,10 +41,10 @@ function publish(topic, publisher, msg, mqtt) {
         }
         ;
     });
-    mqtt.client.on("message", (topic, message) => {
-        common_logger_infra_1.log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
-        publisher.publish(msg);
-    });
+    // mqtt.client.on("message", (topic, message) => {
+    //     log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
+    //     publisher.publish(msg);
+    // });
 }
 exports.publish = publish;
 ;

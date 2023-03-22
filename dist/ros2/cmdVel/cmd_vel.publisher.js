@@ -25,6 +25,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const rclnodejs = __importStar(require("rclnodejs"));
+const common_logger_infra_1 = require("../common/common_logger.infra");
 const common_node_infra_1 = require("../common/common_node.infra");
 class CmdVelPublisher {
     constructor(topic, mqtt) {
@@ -40,8 +41,12 @@ class CmdVelPublisher {
         if (this.isRunning)
             return;
         this.isRunning = true;
-        let msg = this.genTwistMsg();
-        (0, common_node_infra_1.publish)('wavem/1/cmd_vel', this.publisher, msg, this.mqtt);
+        (0, common_node_infra_1.publish)('wavem/1/cmd_vel', this.publisher, '', this.mqtt);
+        this.mqtt.client.on("message", (topic, message) => {
+            common_logger_infra_1.log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
+            let msg = this.genTwistMsg(message.toString());
+            this.publisher.publish(msg);
+        });
     }
     ;
     stop() {
@@ -49,10 +54,38 @@ class CmdVelPublisher {
         this.mqtt.client.unsubscribe('wavem/1/cmd_vel');
     }
     ;
-    genTwistMsg(range = 10) {
+    genTwistMsg(message) {
         let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist');
-        twistMsg.linear = { x: 0, y: 0, z: 0 };
-        twistMsg.angular = { x: 0, y: 0, z: 0 };
+        let liX = 0.0;
+        let angZ = 0.0;
+        const command = JSON.parse(message).command;
+        if (command === 'forward') {
+            liX += 0.25;
+            common_logger_infra_1.log.info(`RCL cmd_vel move forward : liX ${liX}, angZ : ${angZ}`);
+        }
+        else if (command === 'backward') {
+            liX -= 0.25;
+            common_logger_infra_1.log.info(`RCL cmd_vel move backward : liX ${liX}, angZ : ${angZ}`);
+        }
+        else if (command === 'left') {
+            angZ -= 0.35;
+            common_logger_infra_1.log.info(`RCL cmd_vel move left : liX ${liX}, angZ : ${angZ}`);
+        }
+        else if (command === 'right') {
+            angZ += 0.35;
+            common_logger_infra_1.log.info(`RCL cmd_vel move right : liX ${liX}, angZ : ${angZ}`);
+        }
+        else if (command === 'stop') {
+            liX = 0.0;
+            angZ = 0.0;
+            common_logger_infra_1.log.info(`RCL cmd_vel move stop : liX ${liX}, angZ : ${angZ}`);
+        }
+        else {
+            liX = 0.0;
+            angZ = 0.0;
+        }
+        twistMsg.linear = { x: liX, y: 0, z: 0 };
+        twistMsg.angular = { x: 0, y: 0, z: angZ };
         return twistMsg;
     }
     ;

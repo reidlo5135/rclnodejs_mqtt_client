@@ -18,10 +18,10 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
         };
     });
 
-    mqtt.client.on("message", (topic, message) => {
-        log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
-        publisher.publish(msg);
-    });
+    // mqtt.client.on("message", (topic, message) => {
+    //     log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
+    //     publisher.publish(msg);
+    // });
 };
 
 export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : rclnodejs.Subscription {
