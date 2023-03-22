@@ -24,7 +24,7 @@ class Mqtt {
             }
         });
         this.client.on("error", (err) => {
-            common_logger_infra_1.log.error(`Mqtt Error Occurred Caused By ${err}`);
+            common_logger_infra_1.log.error(`MQTT Error Occurred Caused By ${err}`);
             process.exit(1);
         });
     }

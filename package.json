@@ -6,7 +6,9 @@
   "author": "",
   "license": "TODO: License declaration",
   "scripts": {
-    "main": "nodemon src/index.ts",
+    "overall": "nodemon src/overall.ts",
+    "overall_subscription": "nodemon src/overall_subscription.ts",
+    "overall_publishing": "nodemon src/overall_publishing.ts",
     "build": "tsc"
   },
   "bin": {

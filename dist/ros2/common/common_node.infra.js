@@ -23,29 +23,29 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.clientForMap = exports.subscribe = exports.publish = void 0;
+exports.clientForMap = exports.subscribe = exports.publish = exports.initPublish = void 0;
 const rclnodejs = __importStar(require("rclnodejs"));
 const common_logger_infra_1 = require("./common_logger.infra");
-function publish(topic, type) {
-    const topArr = topic.split('/');
-    common_logger_infra_1.log.info(`RCL publish message type : ${type}, topic : ${topArr[2]} `);
-    const node = new rclnodejs.Node(topArr[2] + '_publisher_node');
-    const publisher = node.createPublisher(type, topArr[2]);
-    console.log(`Publishing message: Hello ROS`);
-    publisher.publish({
-        header: {
-            stamp: {
-                sec: 123456,
-                nanosec: 789,
-            },
-            frame_id: 'main frame',
-        },
-        name: ['Tom', 'Jerry'],
-        position: [1, 2],
-        velocity: [2, 3],
-        effort: [4, 5, 6],
+function initPublish(node, type, topic) {
+    common_logger_infra_1.log.info(`RCL init publish message type : ${type}, topic : ${topic}`);
+    return node.createPublisher(type, topic);
+}
+exports.initPublish = initPublish;
+;
+function publish(topic, publisher, msg, mqtt) {
+    common_logger_infra_1.log.info(`RCL publish MQTT topic : ${topic}`);
+    mqtt.client.subscribe(topic, function (err, granted) {
+        if (err) {
+            common_logger_infra_1.log.error(`RCL publish subscribe Error Occurred Caused By ${err}`);
+            return;
+        }
+        ;
+        common_logger_infra_1.log.info(`RCL publish MQTT subscribe ${typeof granted}`, granted);
     });
-    node.spin();
+    mqtt.client.on("message", (topic, message) => {
+        common_logger_infra_1.log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
+        publisher.publish(msg);
+    });
 }
 exports.publish = publish;
 ;
@@ -92,10 +92,4 @@ function clientForMap(msg_type, req_type, service, mqtt) {
 }
 exports.clientForMap = clientForMap;
 ;
-function destroyDuplicateNode(node) {
-    if (node.getNodeNames().includes(node.name())) {
-        node.destroy();
-    }
-    ;
-}
 //# sourceMappingURL=common_node.infra.js.map

@@ -4,29 +4,25 @@ import * as rclnodejs from 'rclnodejs';
 import { log } from './common_logger.infra';
 import Mqtt from '../../mqtt/mqtt.infra';
 
-export function publish(topic:string, type:any) {
-    const topArr = topic.split('/');
-    log.info(`RCL publish message type : ${type}, topic : ${topArr[2]} `);
+export function initPublish(node:rclnodejs.Node, type:any, topic:string) : rclnodejs.Publisher<any> {
+    log.info(`RCL init publish message type : ${type}, topic : ${topic}`);
+    return node.createPublisher(type, topic);
+};
 
-    const node = new rclnodejs.Node(topArr[2] + '_publisher_node');
-    const publisher = node.createPublisher(type, topArr[2]);
-    console.log(`Publishing message: Hello ROS`);
+export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:any, mqtt:Mqtt)  {
+    log.info(`RCL publish MQTT topic : ${topic}`);
+    mqtt.client.subscribe(topic, function(err, granted) {
+        if (err) {
+            log.error(`RCL publish subscribe Error Occurred Caused By ${err}`);
+            return;
+        };
+        log.info(`RCL publish MQTT subscribe ${typeof granted}`, granted);
+    });
 
-    publisher.publish({
-        header: {
-        stamp: {
-            sec: 123456,
-            nanosec: 789,
-        },
-        frame_id: 'main frame',
-        },
-        name: ['Tom', 'Jerry'],
-        position: [1, 2],
-        velocity: [2, 3],
-        effort: [4, 5, 6],
-    }); 
-
-    node.spin();  
+    mqtt.client.on("message", (topic, message) => {
+        log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
+        publisher.publish(msg);
+    });
 };
 
 export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : rclnodejs.Subscription {
@@ -77,9 +73,3 @@ export function clientForMap(msg_type:any, req_type:any, service:string, mqtt:Mq
         log.error(`${node.name} error occurred : ${e}`);
     });
 };
-
-function destroyDuplicateNode(node:rclnodejs.Node) {
-    if(node.getNodeNames().includes(node.name())) {
-        node.destroy();
-    };
-}

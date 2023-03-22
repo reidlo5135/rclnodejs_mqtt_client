@@ -24,7 +24,7 @@ export default class Mqtt {
             }
         });
         this.client.on("error", (err) => {
-            log.error(`Mqtt Error Occurred Caused By ${err}`);
+            log.error(`MQTT Error Occurred Caused By ${err}`);
             process.exit(1);
         });
     };

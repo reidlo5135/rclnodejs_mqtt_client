@@ -25,12 +25,13 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const rclnodejs = __importStar(require("rclnodejs"));
+const common_node_infra_1 = require("../common/common_node.infra");
 class JointStatesPublisher {
     constructor(topic, mqtt) {
         this.topic = topic;
         this.isRunning = false;
         this.node = new rclnodejs.Node('joint_states_publisher');
-        this.publisher = this.node.createPublisher('sensor_msgs/msg/JointState', topic);
+        this.publisher = (0, common_node_infra_1.initPublish)(this.node, 'sensor_msgs/msg/JointState', topic);
         this.mqtt = mqtt;
         this.node.spin();
     }
@@ -40,7 +41,7 @@ class JointStatesPublisher {
             return;
         this.isRunning = true;
         let msg = this.genJointStatesMsg();
-        this.mqtt.subscribeForROSPublisher('wavem/1/joint_states', this.publisher, msg);
+        (0, common_node_infra_1.publish)('wavem/1/joint_states', this.publisher, msg, this.mqtt);
     }
     ;
     stop() {
@@ -50,7 +51,7 @@ class JointStatesPublisher {
     ;
     genJointStatesMsg(range = 10) {
         let jointStateMsg = rclnodejs.createMessageObject('sensor_msgs/msg/JointState');
-        jointStateMsg.header.frame_id = 'joint_state';
+        jointStateMsg.header.frame_id = 'joint_states';
         jointStateMsg.header.stamp = this.node.now().toMsg();
         return jointStateMsg;
     }

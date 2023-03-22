@@ -1,18 +1,22 @@
 'strict mode';
 
 import * as rclnodejs from 'rclnodejs';
+import Mqtt from '../../../mqtt/mqtt.infra';
 import { log } from '../../common/common_logger.infra';
+import { initPublish, publish } from '../../common/common_node.infra';
 
-export class LaserScanPublisher {
+export default class LaserScanPublisher {
 
   private isRunning = false;
   private readonly node: rclnodejs.Node;
   private publisher: rclnodejs.Publisher<'sensor_msgs/msg/LaserScan'>;
   private publisherTimer: any;
+  private mqtt:Mqtt;
 
-  constructor(public readonly topic:string) {
+  constructor(public readonly topic:string, mqtt:Mqtt) {
     this.node = new rclnodejs.Node('laser_scan_publisher');
-    this.publisher = this.node.createPublisher('sensor_msgs/msg/LaserScan', topic);
+    this.publisher = initPublish(this.node, 'sensor_msgs/msg/LaserScan', topic);
+    this.mqtt = mqtt;
     this.node.spin();
   };
 
@@ -22,9 +26,10 @@ export class LaserScanPublisher {
     this.isRunning = true;
 
     this.publisherTimer = this.node.createTimer(interval, () => {
-      let msg = this.genLaserScanMsg();
-      this.publisher.publish(msg);
+      
     });
+    let msg = this.genLaserScanMsg();
+    publish('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
   };
 
   stop() {

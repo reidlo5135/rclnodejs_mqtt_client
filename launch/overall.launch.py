@@ -14,17 +14,18 @@ def generate_launch_description():
 
     share_directory = get_package_share_directory('ros2_mqtt_client')
 
-    start_js_file = os.path.join(
+    start = os.path.join(
         share_directory,
         'dist',
-        'index.js')
+        'overall.js'
+    )
 
     start_javascript_node = Node(
         executable='node',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}],
         arguments=[
-            start_js_file
+            start
         ],
         cwd=share_directory)
 

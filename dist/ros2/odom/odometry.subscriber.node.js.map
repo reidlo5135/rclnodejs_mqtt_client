@@ -1,1 +1,0 @@
-{"version":3,"file":"odometry.subscriber.node.js","sourceRoot":"","sources":["../../../src/ros2/odom/odometry.subscriber.node.ts"],"names":[],"mappings":"AAAA,YAAY,CAAC;;AAGb,mEAA8D;AAE9D,SAAwB,wBAAwB,CAAC,IAAS;IACtD,IAAA,6BAAS,EAAC,IAAA,wBAAI,EAAC,0BAA0B,CAAC,EAAE,uBAAuB,EAAE,OAAO,EAAE,IAAI,CAAC,CAAC;AACxF,CAAC;AAFD,2CAEC;AAAA,CAAC"}

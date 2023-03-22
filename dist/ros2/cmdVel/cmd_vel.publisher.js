@@ -25,51 +25,38 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const rclnodejs = __importStar(require("rclnodejs"));
-const common_node_infra_1 = require("../../common/common_node.infra");
-class LaserScanPublisher {
+const common_node_infra_1 = require("../common/common_node.infra");
+class CmdVelPublisher {
     constructor(topic, mqtt) {
         this.topic = topic;
         this.isRunning = false;
-        this.node = new rclnodejs.Node('laser_scan_publisher');
-        this.publisher = (0, common_node_infra_1.initPublish)(this.node, 'sensor_msgs/msg/LaserScan', topic);
+        this.node = new rclnodejs.Node('cmd_vel_publisher');
+        this.publisher = (0, common_node_infra_1.initPublish)(this.node, 'geometry_msgs/msg/Twist', topic);
         this.mqtt = mqtt;
         this.node.spin();
     }
     ;
-    start(interval = 1000) {
+    start() {
         if (this.isRunning)
             return;
         this.isRunning = true;
-        this.publisherTimer = this.node.createTimer(interval, () => {
-        });
-        let msg = this.genLaserScanMsg();
-        (0, common_node_infra_1.publish)('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
+        let msg = this.genTwistMsg();
+        (0, common_node_infra_1.publish)('wavem/1/cmd_vel', this.publisher, msg, this.mqtt);
     }
     ;
     stop() {
-        this.publisherTimer.cancel();
-        this.publisherTimer = null;
         this.isRunning = false;
+        this.mqtt.client.unsubscribe('wavem/1/cmd_vel');
     }
     ;
-    genLaserScanMsg(range = 10) {
-        let laserScanMsg = rclnodejs.createMessageObject('sensor_msgs/msg/LaserScan');
-        laserScanMsg.header.frame_id = 'laser_frame';
-        laserScanMsg.header.stamp = this.node.now().toMsg();
-        let sample_cnt = 180;
-        let ranges = new Array(sample_cnt).fill(range);
-        laserScanMsg.angle_min = 0;
-        laserScanMsg.angle_max = Math.PI / 2.0;
-        laserScanMsg.angle_increment = Math.PI / 180.0;
-        laserScanMsg.time_increment = 1.0 / sample_cnt;
-        laserScanMsg.scan_time = 1.0;
-        laserScanMsg.range_min = range - 1;
-        laserScanMsg.range_max = range + 1;
-        laserScanMsg.ranges = ranges;
-        return laserScanMsg;
+    genTwistMsg(range = 10) {
+        let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist');
+        twistMsg.linear = { x: 0, y: 0, z: 0 };
+        twistMsg.angular = { x: 0, y: 0, z: 0 };
+        return twistMsg;
     }
     ;
 }
-exports.default = LaserScanPublisher;
+exports.default = CmdVelPublisher;
 ;
-//# sourceMappingURL=laser_scan.publisher.js.map
+//# sourceMappingURL=cmd_vel.publisher.js.map
