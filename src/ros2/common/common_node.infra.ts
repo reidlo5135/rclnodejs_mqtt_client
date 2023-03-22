@@ -16,7 +16,6 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
             log.error(`RCL publish subscribe Error Occurred Caused By ${err}`);
             return;
         };
-        log.info(`RCL publish MQTT subscribe ${typeof granted}`, granted);
     });
 
     mqtt.client.on("message", (topic, message) => {
@@ -44,12 +43,12 @@ export function clientForMap(msg_type:any, req_type:any, service:string, mqtt:Mq
 
     client.waitForService(1000).then((result) => {
         if(!result) {
-            log.error(`${service} is not available...`);
+            log.error(`RCL ${service} is not available...`);
             rclnodejs.shutdown();
             return;
         };
 
-        log.info(`[INFO] sending to ${service} with ${typeof request}`, request);
+        log.info(`RCL sending to ${service} with ${typeof request}`, request);
         client.sendRequest(request, (response) => {
             log.info(`${service} service call is null? `, response === null);
             

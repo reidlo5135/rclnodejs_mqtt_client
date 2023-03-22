@@ -40,7 +40,7 @@ export const log = winston.createLogger({
          filename: `%DATE%.debug.log`,
          maxFiles: 30,
          zippedArchive: true,
-      }),
+      })
      ],
      exceptionHandlers: [
         new winstonDaily({

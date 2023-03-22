@@ -30,7 +30,7 @@ async function run() {
 };
 
 (async function main(): Promise<void> {
-    run();
+    run().then(() => log.info('ROS2-MQTT Client is ready for RCL'));
 })().catch((e): void => {
     log.error('overall error : ', e);
     process.exitCode = 1
