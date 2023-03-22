@@ -64,7 +64,7 @@ function run() {
 ;
 (function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        run();
+        run().then(() => common_logger_infra_1.log.info('ROS2-MQTT Client is ready for RCL'));
     });
 })().catch((e) => {
     common_logger_infra_1.log.error('overall error : ', e);

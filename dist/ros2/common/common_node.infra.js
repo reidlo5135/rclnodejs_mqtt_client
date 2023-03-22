@@ -40,7 +40,6 @@ function publish(topic, publisher, msg, mqtt) {
             return;
         }
         ;
-        common_logger_infra_1.log.info(`RCL publish MQTT subscribe ${typeof granted}`, granted);
     });
     mqtt.client.on("message", (topic, message) => {
         common_logger_infra_1.log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
@@ -65,12 +64,12 @@ function clientForMap(msg_type, req_type, service, mqtt) {
     const request = rclnodejs.createMessageObject(req_type);
     client.waitForService(1000).then((result) => {
         if (!result) {
-            common_logger_infra_1.log.error(`${service} is not available...`);
+            common_logger_infra_1.log.error(`RCL ${service} is not available...`);
             rclnodejs.shutdown();
             return;
         }
         ;
-        common_logger_infra_1.log.info(`[INFO] sending to ${service} with ${typeof request}`, request);
+        common_logger_infra_1.log.info(`RCL sending to ${service} with ${typeof request}`, request);
         client.sendRequest(request, (response) => {
             common_logger_infra_1.log.info(`${service} service call is null? `, response === null);
             const buffer = Buffer.from(response.map.data);

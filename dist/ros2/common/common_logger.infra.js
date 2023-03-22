@@ -38,7 +38,7 @@ exports.log = winston_1.default.createLogger({
             filename: `%DATE%.debug.log`,
             maxFiles: 30,
             zippedArchive: true,
-        }),
+        })
     ],
     exceptionHandlers: [
         new winston_daily_rotate_file_1.default({
