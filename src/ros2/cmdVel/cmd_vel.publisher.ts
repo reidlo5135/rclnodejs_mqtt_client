@@ -52,12 +52,30 @@ export default class CmdVelPublisher {
             liX -= 0.25;
             log.info(`RCL cmd_vel move backward : liX ${liX}, angZ : ${angZ}`);
         } else if (command === 'left') {
+            liX += 0.125;
             angZ -= 0.35;
             log.info(`RCL cmd_vel move left : liX ${liX}, angZ : ${angZ}`);
+        } else if (command === 'twForLeft') {
+            liX += 0.20;
+            angZ -= 0.30;
+            log.info(`RCL cmd_vel move twForLeft : liX ${liX}, angZ : ${angZ}`);
+        } else if (command === 'twBackLeft') {
+            liX -= 0.20;
+            angZ -= 0.30;
+            log.info(`RCL cmd_vel move twBackLeft : liX ${liX}, angZ : ${angZ}`);
         } else if (command === 'right') {
+            liX += 0.125;
             angZ += 0.35;
             log.info(`RCL cmd_vel move right : liX ${liX}, angZ : ${angZ}`);
-        } else if (command === 'stop') {
+        } else if (command === 'twForRight') {
+            liX += 0.125;
+            angZ += 0.30;
+            log.info(`RCL cmd_vel move twForRight : liX ${liX}, angZ : ${angZ}`);
+        } else if (command === 'twBackRight') {
+            liX -= 0.125;
+            angZ += 0.30;
+            log.info(`RCL cmd_vel move twBackRight : liX ${liX}, angZ : ${angZ}`);
+        } else if (command === 's') {
             liX = 0.0;
             angZ = 0.0;
             log.info(`RCL cmd_vel move stop : liX ${liX}, angZ : ${angZ}`);
