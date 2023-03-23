@@ -10,6 +10,7 @@ export default class Mqtt {
     constructor();
     private onConnect;
     publish(topic: string, message: string): void;
+    subscribe(topic: string): void;
     subscribeForROSPublisher(topic: string, publisher: rclnodejs.Publisher<any>, msg: any): void;
     subscribeForServiceCall(topic: string): void;
 }

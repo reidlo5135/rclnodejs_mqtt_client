@@ -34,6 +34,15 @@ export default class Mqtt {
         this.client.publish(topic, message);
     };
 
+    public subscribe(topic:string) {
+        this.client.subscribe(topic, function(err, granted) {
+            if (err) {
+                log.error(`RCL ${topic} subscribe Error Occurred Caused By ${err}`);
+                return;
+            };
+        });
+    };
+
     public subscribeForROSPublisher(topic: string, publisher: rclnodejs.Publisher<any>, msg:any) {
         log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
         this.client.subscribe(topic, function(err, granted) {

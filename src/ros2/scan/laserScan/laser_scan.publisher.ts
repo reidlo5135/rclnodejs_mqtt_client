@@ -25,11 +25,12 @@ export default class LaserScanPublisher {
 
     this.isRunning = true;
 
-    this.publisherTimer = this.node.createTimer(interval, () => {
-      
-    });
     let msg = this.genLaserScanMsg();
-    publish('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
+
+    this.publisherTimer = this.node.createTimer(interval, () => {
+      this.publisher.publish(msg);
+    });
+    // publish('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
   };
 
   stop() {

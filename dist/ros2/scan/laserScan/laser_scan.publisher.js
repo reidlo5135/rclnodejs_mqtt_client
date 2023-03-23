@@ -40,10 +40,11 @@ class LaserScanPublisher {
         if (this.isRunning)
             return;
         this.isRunning = true;
-        this.publisherTimer = this.node.createTimer(interval, () => {
-        });
         let msg = this.genLaserScanMsg();
-        (0, common_node_infra_1.publish)('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
+        this.publisherTimer = this.node.createTimer(interval, () => {
+            this.publisher.publish(msg);
+        });
+        // publish('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
     }
     ;
     stop() {

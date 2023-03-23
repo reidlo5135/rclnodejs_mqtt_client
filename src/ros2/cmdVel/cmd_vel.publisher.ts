@@ -23,9 +23,8 @@ export default class CmdVelPublisher {
         if (this.isRunning) return;
     
         this.isRunning = true;
-
-        publish('wavem/1/cmd_vel', this.publisher, '', this.mqtt);
-
+        
+        this.mqtt.subscribe('wavem/1/cmd_vel');
         this.mqtt.client.on("message", (topic, message) => {
             log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
             let msg = this.genTwistMsg(message.toString());
