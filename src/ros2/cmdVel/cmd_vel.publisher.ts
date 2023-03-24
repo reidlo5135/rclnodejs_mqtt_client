@@ -9,10 +9,10 @@ export default class CmdVelPublisher {
 
     private isRunning = false;
     private readonly node: rclnodejs.Node;
-    private publisher: rclnodejs.Publisher<'geometry_msgs/msg/Twist'>;
-    private mqtt: Mqtt;
+    private readonly publisher: rclnodejs.Publisher<'geometry_msgs/msg/Twist'>;
+    private readonly mqtt: Mqtt;
 
-    constructor(public readonly topic:string, mqtt:Mqtt) {
+    constructor(private readonly topic:string, mqtt:Mqtt) {
         this.node = new rclnodejs.Node('cmd_vel_publisher');
         this.publisher = initPublish(this.node, 'geometry_msgs/msg/Twist', topic);
         this.mqtt = mqtt;
@@ -26,9 +26,11 @@ export default class CmdVelPublisher {
         
         this.mqtt.subscribe('wavem/1/cmd_vel');
         this.mqtt.client.on("message", (topic, message) => {
-            log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
-            let msg = this.genTwistMsg(message.toString());
-            this.publisher.publish(msg);
+            log.info(`RCL cmd_vel publish MQTT onMessage topic : ${topic}, message : ${message}`);
+            if(topic.includes('cmd_vel')) {
+                let msg = this.genTwistMsg(message.toString());
+                this.publisher.publish(msg);
+            } else return;
         });
     };
 
@@ -41,6 +43,12 @@ export default class CmdVelPublisher {
         let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist') as rclnodejs.geometry_msgs.msg.Twist;
 
         const twist = JSON.parse(message);
+
+        if((twist.linear === null || twist.linear === '') || (twist.angular === null || twist.angular === '')) {
+            twistMsg.linear = {x:0,y:0,z:0};
+            twistMsg.angular = {x:0,y:0,z:0};
+            throw new Error('RCL cmdVel publish values is empty...');
+        };
 
         twistMsg.linear = twist.linear;
         twistMsg.angular = twist.angular;

@@ -9,11 +9,11 @@ export default class LaserScanPublisher {
 
   private isRunning = false;
   private readonly node: rclnodejs.Node;
-  private publisher: rclnodejs.Publisher<'sensor_msgs/msg/LaserScan'>;
+  private readonly publisher: rclnodejs.Publisher<'sensor_msgs/msg/LaserScan'>;
   private publisherTimer: any;
-  private mqtt:Mqtt;
+  private readonly mqtt:Mqtt;
 
-  constructor(public readonly topic:string, mqtt:Mqtt) {
+  constructor(private readonly topic:string, mqtt:Mqtt) {
     this.node = new rclnodejs.Node('laser_scan_publisher');
     this.publisher = initPublish(this.node, 'sensor_msgs/msg/LaserScan', topic);
     this.mqtt = mqtt;

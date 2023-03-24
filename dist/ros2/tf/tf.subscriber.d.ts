@@ -1,5 +1,5 @@
 import Mqtt from '../../mqtt/mqtt.infra';
-export default class ScanSubscriber {
+export default class TfSubscriber {
     private readonly topic;
     private readonly type;
     private isRunning;
@@ -7,4 +7,4 @@ export default class ScanSubscriber {
     private readonly subscriber;
     constructor(topic: string, type: any, mqtt: Mqtt);
 }
-//# sourceMappingURL=scan.subscriber.d.ts.map
+//# sourceMappingURL=tf.subscriber.d.ts.map

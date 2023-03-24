@@ -1,11 +1,11 @@
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
 export default class CmdVelPublisher {
-    readonly topic: string;
+    private readonly topic;
     private isRunning;
     private readonly node;
-    private publisher;
-    private mqtt;
+    private readonly publisher;
+    private readonly mqtt;
     constructor(topic: string, mqtt: Mqtt);
     start(): void;
     stop(): void;

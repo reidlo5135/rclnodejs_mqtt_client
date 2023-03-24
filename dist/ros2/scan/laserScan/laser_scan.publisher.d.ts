@@ -1,12 +1,12 @@
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../../mqtt/mqtt.infra';
 export default class LaserScanPublisher {
-    readonly topic: string;
+    private readonly topic;
     private isRunning;
     private readonly node;
-    private publisher;
+    private readonly publisher;
     private publisherTimer;
-    private mqtt;
+    private readonly mqtt;
     constructor(topic: string, mqtt: Mqtt);
     start(interval?: number): void;
     stop(): void;

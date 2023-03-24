@@ -12,6 +12,5 @@ export default class Mqtt {
     publish(topic: string, message: string): void;
     subscribe(topic: string): void;
     subscribeForROSPublisher(topic: string, publisher: rclnodejs.Publisher<any>, msg: any): void;
-    subscribeForServiceCall(topic: string): void;
 }
 //# sourceMappingURL=mqtt.infra.d.ts.map

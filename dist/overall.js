@@ -45,6 +45,8 @@ const imu_data_subscriber_1 = __importDefault(require("./ros2/imu/imu_data.subsc
 const robot_pose_subscriber_1 = __importDefault(require("./ros2/robotPose/robot_pose.subscriber"));
 const scan_subscriber_1 = __importDefault(require("./ros2/scan/scan.subscriber"));
 const common_logger_infra_1 = require("./ros2/common/common_logger.infra");
+const map_client_1 = __importDefault(require("./ros2/map/map_server/map.client"));
+const tf_subscriber_1 = __importDefault(require("./ros2/tf/tf.subscriber"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         yield rclnodejs.init();
@@ -59,6 +61,9 @@ function run() {
         const odom = new odometry_subscriber_1.default('/odom', 'nav_msgs/msg/Odometry', mqtt);
         const robotPose = new robot_pose_subscriber_1.default('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
         const scan = new scan_subscriber_1.default('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
+        const tf = new tf_subscriber_1.default('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
+        const mapServerMapClient = new map_client_1.default('nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', mqtt);
+        mapServerMapClient.call();
     });
 }
 ;

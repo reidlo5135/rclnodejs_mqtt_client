@@ -8,10 +8,10 @@ export default class JointStatesPublisher {
   
     private isRunning = false;
     private readonly node: rclnodejs.Node;
-    private publisher: rclnodejs.Publisher<'sensor_msgs/msg/JointState'>;
+    private readonly publisher: rclnodejs.Publisher<'sensor_msgs/msg/JointState'>;
     private mqtt: Mqtt;
 
-  constructor(public readonly topic:string, mqtt:Mqtt) {
+  constructor(private readonly topic:string, mqtt:Mqtt) {
     this.node = new rclnodejs.Node('joint_states_publisher');
     this.publisher = initPublish(this.node, 'sensor_msgs/msg/JointState', topic);
     this.mqtt = mqtt;

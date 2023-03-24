@@ -43,9 +43,13 @@ class CmdVelPublisher {
         this.isRunning = true;
         this.mqtt.subscribe('wavem/1/cmd_vel');
         this.mqtt.client.on("message", (topic, message) => {
-            common_logger_infra_1.log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
-            let msg = this.genTwistMsg(message.toString());
-            this.publisher.publish(msg);
+            common_logger_infra_1.log.info(`RCL cmd_vel publish MQTT onMessage topic : ${topic}, message : ${message}`);
+            if (topic.includes('cmd_vel')) {
+                let msg = this.genTwistMsg(message.toString());
+                this.publisher.publish(msg);
+            }
+            else
+                return;
         });
     }
     ;
@@ -57,6 +61,12 @@ class CmdVelPublisher {
     genTwistMsg(message) {
         let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist');
         const twist = JSON.parse(message);
+        if ((twist.linear === null || twist.linear === '') || (twist.angular === null || twist.angular === '')) {
+            twistMsg.linear = { x: 0, y: 0, z: 0 };
+            twistMsg.angular = { x: 0, y: 0, z: 0 };
+            throw new Error('RCL cmdVel publish values is empty...');
+        }
+        ;
         twistMsg.linear = twist.linear;
         twistMsg.angular = twist.angular;
         return twistMsg;

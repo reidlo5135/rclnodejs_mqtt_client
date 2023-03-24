@@ -1,7 +1,6 @@
 import mqtt from 'mqtt';
 import * as rclnodejs from 'rclnodejs';
 import { log } from '../ros2/common/common_logger.infra';
-import { clientForMap, publish } from '../ros2/common/common_node.infra';
 
 /**
  * Class for MQTT Connections
@@ -58,24 +57,6 @@ export default class Mqtt {
         this.client.on("message", (topic, message) => {
             log.info(`MQTT onMessage topic : ${topic}, message : ${message}`);
             publisher.publish(msg);
-        });
-    };
-
-    public subscribeForServiceCall(topic:string) {
-        log.info(`MQTT subscribeForServiceCall topic : ${topic}`);
-        this.client.subscribe(topic, function (err, granted) {
-            if (err) {
-                log.error(`MQTT subscribe Error Occurred Caused By ${err}`);
-                return;
-            };
-
-            log.info(`MQTT subscribe ${typeof granted}`, granted);
-        });
-
-        this.client.on("message", (topic, message) => {
-            log.info(`MQTT onMessage topic : ${topic}, message :  ${message}`);
-            clientForMap('nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', new Mqtt());
-            // client(node('static_map_client_test_node'), 'nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/static_map', new Mqtt());
         });
     };
 };
