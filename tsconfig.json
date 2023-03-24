@@ -12,7 +12,13 @@
     "strict": true,
     "esModuleInterop":true,
   },
+  "typedocOptions": {
+    "mode": "modules",
+    "out": "docs"
+  },
   "exclude": [
       "**/dist/**",
-      "**/test/**"]
+      "**/test/**",
+      "**/node_modules/**"
+    ]
 }

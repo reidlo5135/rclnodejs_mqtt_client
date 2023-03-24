@@ -22,7 +22,9 @@ export async function runPublishers() {
 };
 
 (async function main(): Promise<void> {
-  runPublishers();
+  runPublishers()
+    .then(() => log.info('ROS2-MQTT OnlyPublisher is ready for RCL'))
+    .catch((err) => log.error(`ROS2-MQTT OnlyPublisher has crashed by.. ${err} `));
 })().catch((e): void => {
     log.error('overall publishers error : ', e);
     process.exitCode = 1
