@@ -58,7 +58,9 @@ exports.runPublishers = runPublishers;
 ;
 (function main() {
     return __awaiter(this, void 0, void 0, function* () {
-        runPublishers();
+        runPublishers()
+            .then(() => common_logger_infra_1.log.info('ROS2-MQTT OnlyPublisher is ready for RCL'))
+            .catch((err) => common_logger_infra_1.log.error(`ROS2-MQTT OnlyPublisher has crashed by.. ${err} `));
     });
 })().catch((e) => {
     common_logger_infra_1.log.error('overall publishers error : ', e);
