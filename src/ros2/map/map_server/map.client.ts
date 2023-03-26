@@ -28,8 +28,7 @@ export default class MapClient {
                 this.client.waitForService(1000)
                     .then((result) => {
                         if(!result) {
-                            log.error(`RCL ${this.service} is not available...`);
-                            rclnodejs.shutdown();
+                            log.error(`RCL ${this.service} is not available... check your ROS2 Launch Mode`);
                             return;
                         };
 

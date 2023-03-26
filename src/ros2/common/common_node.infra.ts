@@ -1,8 +1,8 @@
 'use strict';
 
 import * as rclnodejs from 'rclnodejs';
-import { log } from './common_logger.infra';
 import Mqtt from '../../mqtt/mqtt.infra';
+import { log } from './common_logger.infra';
 
 export function initPublish(node:rclnodejs.Node, type:any, topic:string) : rclnodejs.Publisher<any> {
     log.info(`RCL init publish message type : ${type}, topic : ${topic}`);
@@ -17,11 +17,6 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
             return;
         };
     });
-
-    // mqtt.client.on("message", (topic, message) => {
-    //     log.info(`RCL publish MQTT onMessage topic : ${topic}, message : ${message}`);
-    //     publisher.publish(msg);
-    // });
 };
 
 export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : rclnodejs.Subscription {

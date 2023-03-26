@@ -1,15 +1,15 @@
-import * as rclnodejs from 'rclnodejs';
 import Mqtt from "./mqtt/mqtt.infra";
+import * as rclnodejs from 'rclnodejs';
+import TfSubscriber from './ros2/tf/tf.subscriber';
+import { log } from './ros2/common/common_logger.infra';
+import ScanSubscriber from './ros2/scan/scan.subscriber';
+import MapClient from './ros2/map/map_server/map.client';
+import CmdVelPublisher from './ros2/cmdVel/cmd_vel.publisher';
+import ImuDataSubscriber from './ros2/imu/imu_data.subscriber';
+import OdometrySubscriber from './ros2/odom/odometry.subscriber';
+import RobotPoseSubscriber from './ros2/robotPose/robot_pose.subscriber';
 import LaserScanPublisher from './ros2/scan/laserScan/laser_scan.publisher';
 import JointStatesPublisher from './ros2/jointStates/joint_states.publisher';
-import CmdVelPublisher from './ros2/cmdVel/cmd_vel.publisher';
-import OdometrySubscriber from './ros2/odom/odometry.subscriber';
-import ImuDataSubscriber from './ros2/imu/imu_data.subscriber';
-import RobotPoseSubscriber from './ros2/robotPose/robot_pose.subscriber';
-import ScanSubscriber from './ros2/scan/scan.subscriber';
-import { log } from './ros2/common/common_logger.infra';
-import MapClient from './ros2/map/map_server/map.client';
-import TfSubscriber from './ros2/tf/tf.subscriber';
 
 async function run() {
     await rclnodejs.init();
@@ -35,10 +35,22 @@ async function run() {
     mapServerMapClient.call();
 };
 
+function welcome() {
+    console.log('  _____   ____   _____ ___    __  __  ____ _______ _______    _____ _      _____ ______ _   _ _______ ');
+    console.log(' |  __ \\ / __ \\ / ____|__ \\  |  \\/  |/ __ \\__   __|__   __|  / ____| |    |_   _|  ____| \\ | |__   __|');
+    console.log(' | |__) | |  | | (___    ) | | \\  / | |  | | | |     | |    | |    | |      | | | |__  |  \\| |  | |   ');
+    console.log(" |  _  /| |  | |\\___ \\  / /  | |\\/| | |  | | | |     | |    | |    | |      | | |  __| | . ` |  | |   ");
+    console.log(' | | \\ \\| |__| |____) |/ /_  | |  | | |__| | | |     | |    | |____| |____ _| |_| |____| |\\  |  | |   ');
+    console.log(' |_|  \\_\\\\____/|_____/|____| |_|  |_|\\___\\_\\ |_|     |_|     \\_____|______|_____|______|_| \\_|  |_|   ');
+    console.log('                                                                                                      ');
+    log.info('ROS2-MQTT Client is ready for RCL!!');
+};
+
 (async function main(): Promise<void> {
     run()
-    .then(() => log.info('ROS2-MQTT Client is ready for RCL'))
+    .then(() => welcome())
     .catch((err) => log.error(`ROS2-MQTT Client has crashed by.. ${err} `));
+    
 })().catch((e): void => {
     log.error('overall error : ', e);
     process.exitCode = 1
