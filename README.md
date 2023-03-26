@@ -4,7 +4,7 @@
 [![node](https://img.shields.io/node/v/rclnodejs.svg)](https://nodejs.org/en/download/releases/)
 [![npm type definitions](https://img.shields.io/npm/types/rclnodejs)](https://www.npmjs.com/package/rclnodejs)
 
-- Document
+## Document
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
     - [Installing Node(Nodejs) / Npm](#installing-nodenodejs--npm)
@@ -25,9 +25,9 @@ Before installing, please ensure the following softare is installed and configur
 - [ROS2 setup](https://index.ros.org/doc/ros2/Installation/) for install rclnodejs by npm -
   **INSTALL [ROS2 Foxy-Fitzroy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)**
 
-### Installing node(nodejs) / npm
+### Installing node(nodejs) & npm
 
-Install the node(nodejs) / npm into your Linux(Ubuntu 20.0.4LTS)
+Install the node(nodejs) & npm into your Linux(Ubuntu 20.0.4LTS)
 
 For the most current version of nodejs :
 
@@ -41,7 +41,7 @@ For the most current version of npm(node package manager) :
 sudo install npm -g
 ```
 
-Install node(nodejs) / npm latest version by n :
+Install node(nodejs) & npm latest version by n :
 
 ```bash
 sudo npm i n
@@ -51,7 +51,7 @@ sudo npm i n
 sudo n 18.15.0
 ```
 
-Check Your node(nodejs) / npm version
+Check Your node(nodejs) & npm version
 
 ```bash
 node -v
