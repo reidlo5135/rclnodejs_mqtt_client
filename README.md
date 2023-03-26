@@ -86,6 +86,12 @@ cd ${your directory}/ros2_mqtt_client
 npm i
 ```
 
+If error occurs during installing npm modules apply your ROS2 setup.bash
+
+```bash
+source /opt/ros2/foxy/setup.bash
+```
+
 For the npm build project
 
 ```bash

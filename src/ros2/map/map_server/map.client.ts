@@ -5,13 +5,51 @@ import Mqtt from '../../../mqtt/mqtt.infra';
 import { log } from '../../common/common_logger.infra';
 import { client } from '../../common/common_node.infra';
 
+/**
+ * Class for ROS2 client for call /map_server/map service
+ * @see rclnodejs.Client
+ */
 export default class MapClient {
+
+    /**
+     * private boolean filed for this node is running or not
+     */
     private isRunning = false;
+
+    /**
+     * private readonly field for rclnodejs.Node instance
+     * @see rclnodejs.Node
+     */
     private readonly node: rclnodejs.Node;
+
+    /**
+     * private readonly field for rclnodejs.Client<any> instance
+     * @see rclnodejs.Client<any>
+     */
     private readonly client: rclnodejs.Client<any>;
+
+    /**
+     * private readonly field for rclnodejs.Messag instance
+     */
     private readonly request: rclnodejs.Message;
+
+    /**
+     * private readonly field for Mqtt
+     * @see Mqtt
+     */
     private readonly mqtt:Mqtt;
     
+    /**
+     * constructor for initialize field instance
+     * @see node
+     * @see client
+     * @see mqtt
+     * @see rclnodejs.createMessageObject
+     * @param msg_type : any
+     * @param req_type : any
+     * @param service : string
+     * @param mqtt : Mqtt
+     */
     constructor(private readonly msg_type:any, private readonly req_type:any, private readonly service:string, mqtt:Mqtt) {
         this.node = new rclnodejs.Node('map_client', 'map_server');
         this.client = client(this.node, msg_type, service);
@@ -20,6 +58,12 @@ export default class MapClient {
         this.node.spin();
     };
 
+    /**
+     * void function for MQTT subscription & create ROS2 client for call ROS2 service & convert recieved MQTT message(map data) into hex string
+     * @see mqtt
+     * @see client
+     * @see client.waitForService
+     */
     call(): void {
         this.mqtt.subscribe('wavem/1/requestMap');
         this.mqtt.client.on('message', (topic, message) => {

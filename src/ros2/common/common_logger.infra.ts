@@ -1,19 +1,32 @@
-import winston from 'winston';
 import process from 'process';
+import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
+/**
+ * const instance for select winston's functions
+ */
 const { combine, timestamp, label, printf } = winston.format;
 
+/**
+ * const instance for define log files' directory
+ */
 const logDir = `${process.cwd()}/logs`;
 
+/**
+ * const instance for define logging message format
+ */
 const logFormat = printf(({ level, message, label, timestamp }) => {
    return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
+/**
+ * const instance for create winston logger
+ * @see winston
+ */
 export const log = winston.createLogger({
     format: combine(
        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-       label({ label: 'ros2_mqtt_client' }),
+       label({ label: 'ros2_ugv_server' }),
        logFormat,
     ),
     transports: [
@@ -40,7 +53,7 @@ export const log = winston.createLogger({
          filename: `%DATE%.debug.log`,
          maxFiles: 30,
          zippedArchive: true,
-      })
+      }),
      ],
      exceptionHandlers: [
         new winstonDaily({

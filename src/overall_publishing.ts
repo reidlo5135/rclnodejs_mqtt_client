@@ -2,24 +2,56 @@ import Mqtt from "./mqtt/mqtt.infra";
 import * as rclnodejs from 'rclnodejs';
 import { log } from './ros2/common/common_logger.infra';
 import CmdVelPublisher from './ros2/cmdVel/cmd_vel.publisher';
-import LaserScanPublisher from './ros2/scan/laserScan/laser_scan.publisher';
+import LaserScanPublisher from './ros2/scan/laserScan/laser_frame.publisher';
 import JointStatesPublisher from './ros2/jointStates/joint_states.publisher';
 
+/**
+ * async function for run ROS2-MQTT Publishers
+ */
 export async function runPublishers() {
+
+  /**
+   * await function for rclnodejs.init();
+   */
   await rclnodejs.init();
 
+  /**
+   * const instance for mqtt class
+   * @see Mqtt
+   */
   const mqtt:Mqtt = new Mqtt();  
 
+  /**
+   * const instance for LaserScanPublihser class
+   * @see LaserScanPublihser
+   * @see LaserScanPublihser.start
+   * @see mqtt
+   */
   const laserScanPublisher = new LaserScanPublisher('laser_frame', mqtt);
   laserScanPublisher.start();
 
+  /**
+   * const instance for JointStatesPublisher class
+   * @see JointStatesPublisher
+   * @see JointStatesPublisher.start
+   * @see mqtt
+   */
   const jointStatesPublisher = new JointStatesPublisher('joint_states', mqtt);
   jointStatesPublisher.start();  
 
+  /**
+   * const instance for CmdVelPublisher class
+   * @see CmdVelPublisher
+   * @see CmdVelPublisher.start
+   * @see mqtt
+   */
   const cmdVelPublisher = new CmdVelPublisher('cmd_vel', mqtt);
   cmdVelPublisher.start();
 };
 
+/**
+ * function for logging when run() started
+ */
 function welcome() {
   console.log('  _____   ____   _____ ___    __  __  ____ _______ _______    _____ _      _____ ______ _   _ _______ ');
   console.log(' |  __ \\ / __ \\ / ____|__ \\  |  \\/  |/ __ \\__   __|__   __|  / ____| |    |_   _|  ____| \\ | |__   __|');
@@ -31,6 +63,10 @@ function welcome() {
   log.info('ROS2-MQTT OnlyPublisher is ready for RCL')
 };
 
+/**
+ * async function for main runtime
+ * @returns : Promise<void>
+ */
 (async function main(): Promise<void> {
   runPublishers()
     .then(() => welcome())

@@ -13,8 +13,18 @@
     "esModuleInterop":true,
   },
   "typedocOptions": {
-    "mode": "modules",
-    "out": "docs"
+    "entryPoints": [
+      "./src/mqtt/**",
+      "./src/ros2/**/**",
+      "./src/overall.ts",
+      "./src/overall.publishing.ts",
+      "./src/overall.subscription.ts"
+    ],
+    "out": "./docs",
+    "name":"Documents of ROS2-MQTT Client",
+    "excludePrivate": false,
+    "readme": "README.md",
+    "gitRevision": "Dev_Reidlo_230326"
   },
   "exclude": [
       "**/dist/**",

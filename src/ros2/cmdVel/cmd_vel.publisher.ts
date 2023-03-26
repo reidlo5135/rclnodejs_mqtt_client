@@ -6,7 +6,7 @@ import { log } from '../common/common_logger.infra';
 import { initPublish } from '../common/common_node.infra';
 
 /**
- * Class for ROS2 publish /cmd_vel to Robot
+ * Class for ROS2 publish /cmd_vel topic to robot
  * @see rclnodejs.Publisher
  */
 export default class CmdVelPublisher {
@@ -15,10 +15,35 @@ export default class CmdVelPublisher {
      * private boolean filed for this node is running or not
      */
     private isRunning = false;
+    
+    /**
+     * private readonly field for rclnodejs.Node instance
+     * @see rclnodejs.Node
+     */
     private readonly node: rclnodejs.Node;
+
+    /**
+     * private readonly field for rclnodejs.Publisher<'geometry_msgs/msg/Twist'> instance
+     * @see rclnodejs.Publisher
+     * @see geometry_msgs/msgs/Twist
+     */
     private readonly publisher: rclnodejs.Publisher<'geometry_msgs/msg/Twist'>;
+
+    /**
+     * private readonly field for Mqtt
+     * @see Mqtt
+     */
     private readonly mqtt: Mqtt;
 
+    /**
+     * constructor for initialize field instances
+     * @see node
+     * @see publisher
+     * @see mqtt
+     * @see initPublish
+     * @param topic : string
+     * @param mqtt : Mqtt
+     */
     constructor(private readonly topic:string, mqtt:Mqtt) {
         this.node = new rclnodejs.Node('cmd_vel_publisher');
         this.publisher = initPublish(this.node, 'geometry_msgs/msg/Twist', topic);
@@ -26,6 +51,11 @@ export default class CmdVelPublisher {
         this.node.spin();
     };
 
+    /**
+     * void function for MQTT subscription & ROS2 publish by recieved MQTT message
+     * @see mqtt
+     * @see publisher
+     */
     start(): void {
         if (this.isRunning) return;
     
@@ -41,11 +71,20 @@ export default class CmdVelPublisher {
         });
     };
 
+    /**
+     * void function for stop node spinning & MQTT unsubscribe
+     */
     stop(): void {
         this.isRunning = false;
         this.mqtt.client.unsubscribe('wavem/1/cmd_vel');
     };
 
+    /**
+     * protected function for generate ROS2 publishing message object
+     * @see rclnodejs.geemetry_msgs.msg.Twist
+     * @param message : any
+     * @returns twistMsg : rclnodejs.geemetry_msgs.msg.Twist
+     */
     protected genTwistMsg(message: any): rclnodejs.geometry_msgs.msg.Twist {
         let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist') as rclnodejs.geometry_msgs.msg.Twist;
 
