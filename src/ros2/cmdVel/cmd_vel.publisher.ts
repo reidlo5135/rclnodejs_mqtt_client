@@ -3,10 +3,17 @@
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
 import { log } from '../common/common_logger.infra';
-import { initPublish, publish } from '../common/common_node.infra';
+import { initPublish } from '../common/common_node.infra';
 
+/**
+ * Class for ROS2 publish /cmd_vel to Robot
+ * @see rclnodejs.Publisher
+ */
 export default class CmdVelPublisher {
 
+    /**
+     * private boolean filed for this node is running or not
+     */
     private isRunning = false;
     private readonly node: rclnodejs.Node;
     private readonly publisher: rclnodejs.Publisher<'geometry_msgs/msg/Twist'>;

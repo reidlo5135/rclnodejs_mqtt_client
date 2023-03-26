@@ -5,6 +5,7 @@ from launch import LaunchDescription
 from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 
+# function for ROS2 launch rclnodejs application
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
