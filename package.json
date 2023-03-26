@@ -1,10 +1,11 @@
 {
   "name": "ros2_mqtt_client",
   "version": "1.0.0",
-  "description": "TODO: Package description",
+  "description": "ROS2-MQTT Client",
+  "main": "dist/overall.js",
   "keywords": [],
-  "author": "",
-  "license": "TODO: License declaration",
+  "author": "wavem-reidlo <naru5135@wavem.net>",
+  "license": "Apache-2.0",
   "scripts": {
     "overall": "nodemon src/overall.ts",
     "overall_subscription": "nodemon src/overall_subscription.ts",
@@ -13,6 +14,10 @@
   },
   "bin": {
     "generate-messages": "node_modules/.bin/generate-ros-messages"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reidlo5135/ros2_mqtt_client"
   },
   "dependencies": {
     "rclnodejs": "^0.21.4",
