@@ -19,6 +19,9 @@
   },
   "dependencies": {
     "rclnodejs": "^0.21.4",
+    "@rclnodejs/ref-array-di": "^1.2.2",
+    "@rclnodejs/ref-napi": "^4.0.0",
+    "@rclnodejs/ref-struct-di": "^1.1.1",
     "mqtt": "^4.3.7",
     "ps-logger": "^1.0.8",
     "winston": "^3.8.2",

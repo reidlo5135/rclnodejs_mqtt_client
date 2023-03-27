@@ -54,17 +54,36 @@ export default class NavigateToPoseActionClient {
         this.mqtt = mqtt;
     };
 
+    /**
+     * void function for create Goal MessageObject & create action client
+     * @see rclnodejs.createMessageObject
+     * @see actionClient
+     * @see client
+     */
     sendGoal(): void {
+        const goal = rclnodejs.createMessageObject('nav2_msgs/action/NavigateToPose_Goal');
         const client = actionClient(this.node, 'nav2_msgs/action/NavigateToPose', 'navigate_to_pose_action_client');
+        this.node.spin();
         client.waitForServer(1000)
             .then((result) => {
                 if(!result || !client.isActionServerAvailable()) {
                     log.error(`RCL action server is not available... check your ROS2 Launch Mode`);
                     return;
                 };
+                const goalHandle = client.sendGoal(goal, (feedback) => {
+                    this.feedbackCallback(feedback);
+                });
             })
             .catch((err) => {
                 log.error(`RCL action client error occurred : ${JSON.stringify(err)}`);
             });
-    }
+    };
+
+    /**
+     * private function for callback from action server
+     * @param feedbackMessage : any
+     */
+    private feedbackCallback(feedbackMessage: any) {
+        log.info(`RCL action feedback ${feedbackMessage.feedback.sequence}`);
+    };
 };
