@@ -28,7 +28,7 @@ def generate_launch_description():
 
     start = os.path.join(
         share_directory,
-        'dist/ros2/mode/tankAll',
+        'dist/ros2/launch/tankAll',
         'overall_tank_all.js'
     )
 

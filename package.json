@@ -6,9 +6,8 @@
   "author": "wavem-reidlo <naru5135@wavem.net>",
   "license": "Apache-2.0",
   "scripts": {
-    "overall": "nodemon src/overall.ts",
-    "overall_subscription": "nodemon src/overall_subscription.ts",
-    "overall_publishing": "nodemon src/overall_publishing.ts",
+    "tank_all": "nodemon src/ros2/launch/tankAll/overall_tank_all.ts",
+    "ros_one_ready": "nodemon src/ros2/launch/ros_one_ready/overall_ros_one_ready.ts",
     "build": "tsc"
   },
   "bin": {

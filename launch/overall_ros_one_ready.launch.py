@@ -28,7 +28,7 @@ def generate_launch_description():
 
     start = os.path.join(
         share_directory,
-        'dist/ros2/mode/rosOneReady',
+        'dist/ros2/launch/rosOneReady',
         'overall_ros_one_ready.js'
     )
 
