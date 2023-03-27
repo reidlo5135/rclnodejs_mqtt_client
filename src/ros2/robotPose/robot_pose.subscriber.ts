@@ -16,13 +16,15 @@
 
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
+import { Subscriber } from '../common/common_ndoe.interface';
 import { subscribe } from '../common/common_node.infra';
 
 /**
  * Class for ROS2 subscribe /roobt_pose topic from robot
  * @see rclnodejs.Subscription
+ * @see Subscriber
  */
-export default class RobotPoseSubscriber {
+export default class RobotPoseSubscriber implements Subscriber {
 
     /**
      * private boolean filed for this node is running or not
@@ -36,24 +38,32 @@ export default class RobotPoseSubscriber {
     private readonly node: rclnodejs.Node;
 
     /**
-     * private readonly field for rclnodejs.Subscription instance
+     * private readonly field for Mqtt instance
      */
-    private readonly subscriber: rclnodejs.Subscription;
+    private readonly mqtt: Mqtt;
 
     /**
      * constructor for initialize field instances
      * @see node
-     * @see subscriber;
+     * @see Mqtt
      * @param topic : string
      * @param type : any
      * @param mqtt : Mqtt
      */
     constructor(private readonly topic:string, private readonly type: any, mqtt:Mqtt) {
         this.node = new rclnodejs.Node('robot_pose_subscriber');
+        this.mqtt = mqtt;
+    };
+
+    start(): void {
         this.isRunning = true;
-        this.topic = topic;
-        this.type = type;
-        this.subscriber = subscribe(this.node, this.type, this.topic, mqtt);
+        subscribe(this.node, this.type, this.topic, this.mqtt);
         this.node.spin();
+    };
+
+    stop(): void {
+        this.isRunning = false;
+        this.mqtt.client.unsubscribe(this.topic);
+        this.node.destroy();
     };
 };

@@ -40,37 +40,42 @@ export async function runSubscriptions() {
   /**
    * const instance for ImuDataSubscriber class
    * @see ImuDataSubscriber
-   * @see mqtt
+   * @see Mqtt
    */
   const imuData = new ImuDataSubscriber('/imu/data', 'sensor_msgs/msg/Imu', mqtt);
+  imuData.start();
 
   /**
    * const instacne for OdometrySubscriber class
    * @see OdometrySubscriber
-   * @see mqtt
+   * @see Mqtt
    */
   const odom = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
+  odom.start();
 
   /**
    * const instance for RobotPoseSubscriber class
    * @see RobotPoseSubscriber
-   * @see mqtt
+   * @see Mqtt
    */
   const robotPose = new RobotPoseSubscriber('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
+  robotPose.start();
 
   /**
    * const instance for ScanSubscriber class
    * @see RobotPoseSubscriber
-   * @see mqtt
+   * @see Mqtt
    */
   const scan = new ScanSubscriber('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
+  scan.start();
 
   /**
    * const instance for TfSubscriber class
    * @see TfSubscriber
-   * @see mqtt
+   * @see Mqtt
    */
   const tf = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
+  tf.start();
 };
 
 /**

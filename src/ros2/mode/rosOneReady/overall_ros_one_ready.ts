@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Mqtt from "./mqtt/mqtt.infra";
+import Mqtt from "../../../mqtt/mqtt.infra";
 import * as rclnodejs from 'rclnodejs';
-import TfSubscriber from './ros2/tf/tf.subscriber';
-import { log } from './ros2/common/common_logger.infra';
-import ScanSubscriber from './ros2/scan/scan.subscriber';
-import MapClient from './ros2/map/map_server/map.client';
-import CmdVelPublisher from './ros2/cmdVel/cmd_vel.publisher';
-import ImuDataSubscriber from './ros2/imu/imu_data.subscriber';
-import OdometrySubscriber from './ros2/odom/odometry.subscriber';
-import RobotPoseSubscriber from './ros2/robotPose/robot_pose.subscriber';
-import LaserScanPublisher from './ros2/scan/laserScan/laser_frame.publisher';
-import JointStatesPublisher from './ros2/jointStates/joint_states.publisher';
+import TfSubscriber from "../../tf/tf.subscriber";
+import { log } from "../../common/common_logger.infra";
+import ScanSubscriber from "../../scan/scan.subscriber";
+import MapClient from "../../map/map_server/map.client";
+import CmdVelPublisher from "../../cmdVel/cmd_vel.publisher";
+import ImuDataSubscriber from "../../imu/imu_data.subscriber";
+import OdometrySubscriber from "../../odom/odometry.subscriber";
+import RobotPoseSubscriber from "../../robotPose/robot_pose.subscriber";
+import LaserScanPublisher from "../../scan/laserScan/laser_frame.publisher";
+import JointStatesPublisher from "../../jointStates/joint_states.publisher";
 
 /**
  * async function for run Overall ROS2-MQTT Client
@@ -128,7 +128,7 @@ function welcome() {
     console.log(' | | \\ \\| |__| |____) |/ /_  | |  | | |__| | | |     | |    | |____| |____ _| |_| |____| |\\  |  | |   ');
     console.log(' |_|  \\_\\\\____/|_____/|____| |_|  |_|\\___\\_\\ |_|     |_|     \\_____|______|_____|______|_| \\_|  |_|   ');
     console.log('                                                                                                      ');
-    log.info('ROS2-MQTT Client is ready for RCL!!');
+    log.info('ROS2-MQTT [ROS-ONE-READY] Client is ready for RCL!!');
 };
 
 /**
@@ -138,8 +138,8 @@ function welcome() {
 (async function main(): Promise<void> {
     run()
     .then(() => welcome())
-    .catch((err) => log.error(`ROS2-MQTT Client has crashed by.. ${err} `));
+    .catch((err) => log.error(`ROS2-MQTT [ROS-ONE-READY] Client has crashed by.. ${err} `));
 })().catch((e): void => {
-    log.error('overall error : ', e);
+    log.error('overall_ros_one_ready error : ', e);
     process.exitCode = 1
 });

@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import Mqtt from "./mqtt/mqtt.infra";
+import Mqtt from "../../../mqtt/mqtt.infra";
 import * as rclnodejs from 'rclnodejs';
-import TfSubscriber from './ros2/tf/tf.subscriber';
-import { log } from './ros2/common/common_logger.infra';
-import ScanSubscriber from './ros2/scan/scan.subscriber';
-import MapClient from './ros2/map/map_server/map.client';
-import CmdVelPublisher from './ros2/cmdVel/cmd_vel.publisher';
-import ImuDataSubscriber from './ros2/imu/imu_data.subscriber';
-import OdometrySubscriber from './ros2/odom/odometry.subscriber';
-import RobotPoseSubscriber from './ros2/robotPose/robot_pose.subscriber';
-import LaserScanPublisher from './ros2/scan/laserScan/laser_frame.publisher';
-import JointStatesPublisher from './ros2/jointStates/joint_states.publisher';
+import TfSubscriber from "../../tf/tf.subscriber";
+import { log } from "../../common/common_logger.infra";
+import ScanSubscriber from "../../scan/scan.subscriber";
+import CmdVelPublisher from "../../cmdVel/cmd_vel.publisher";
+import ImuDataSubscriber from "../../imu/imu_data.subscriber";
+import OdometrySubscriber from "../../odom/odometry.subscriber";
+import LaserScanPublisher from "../../scan/laserScan/laser_frame.publisher";
+import JointStatesPublisher from "../../jointStates/joint_states.publisher";
 
 /**
  * async function for run Overall ROS2-MQTT Client
@@ -85,14 +83,6 @@ async function run() {
     odom.start();
 
     /**
-     * const instance for RobotPoseSubscriber class
-     * @see RobotPoseSubscriber
-     * @see Mqtt
-     */
-    const robotPose = new RobotPoseSubscriber('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
-    robotPose.start();
-
-    /**
      * const instance for ScanSubscriber class
      * @see RobotPoseSubscriber
      * @see Mqtt
@@ -107,14 +97,6 @@ async function run() {
      */
     const tf = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
     tf.start();
-
-    /**
-     * const instance for MapClient
-     * @see MapClient
-     * @see mqtt
-     */
-    const mapServerMapClient = new MapClient('nav_msgs/srv/GetMap', 'nav_msgs/srv/GetMap_Request', '/map_server/map', mqtt);
-    mapServerMapClient.call();
 };
 
 /**
@@ -128,7 +110,7 @@ function welcome() {
     console.log(' | | \\ \\| |__| |____) |/ /_  | |  | | |__| | | |     | |    | |____| |____ _| |_| |____| |\\  |  | |   ');
     console.log(' |_|  \\_\\\\____/|_____/|____| |_|  |_|\\___\\_\\ |_|     |_|     \\_____|______|_____|______|_| \\_|  |_|   ');
     console.log('                                                                                                      ');
-    log.info('ROS2-MQTT Client is ready for RCL!!');
+    log.info('ROS2-MQTT [TANK-ALL] Client is ready for RCL!!');
 };
 
 /**
@@ -138,8 +120,8 @@ function welcome() {
 (async function main(): Promise<void> {
     run()
     .then(() => welcome())
-    .catch((err) => log.error(`ROS2-MQTT Client has crashed by.. ${err} `));
+    .catch((err) => log.error(`ROS2-MQTT [TANK-ALL] Client has crashed by.. ${err} `));
 })().catch((e): void => {
-    log.error('overall error : ', e);
+    log.error('overall_tankAll error : ', e);
     process.exitCode = 1
 });
