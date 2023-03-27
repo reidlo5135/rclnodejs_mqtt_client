@@ -21,16 +21,17 @@ import { Publisher } from '../common/common_ndoe.interface';
 import { initPublish } from '../common/common_node.infra';
 
 /**
- * Class for ROS2 publish /cmd_vel topic to robot
+ * Class for ROS2 publish /initialpose topic to robot
  * @see rclnodejs.Publisher
  */
-export default class CmdVelPublisher implements Publisher {
+
+export default class InitialPosePublisher implements Publisher {
 
     /**
      * private boolean filed for this node is running or not
      */
     private isRunning = false;
-    
+
     /**
      * private readonly field for rclnodejs.Node instance
      * @see rclnodejs.Node
@@ -38,20 +39,19 @@ export default class CmdVelPublisher implements Publisher {
     private readonly node: rclnodejs.Node;
 
     /**
-     * private readonly field for Mqtt
-     * @see Mqtt
+     * private readonly field for Mqtt instance
      */
     private readonly mqtt: Mqtt;
 
     /**
      * constructor for initialize field instances
      * @see node
-     * @see mqtt
+     * @see Mqtt
      * @param topic : string
      * @param mqtt : Mqtt
      */
     constructor(private readonly topic:string, mqtt:Mqtt) {
-        this.node = new rclnodejs.Node('cmd_vel_publisher');
+        this.node = new rclnodejs.Node('initialpose_publisher');
         this.mqtt = mqtt;
     };
 
@@ -65,20 +65,20 @@ export default class CmdVelPublisher implements Publisher {
         if (this.isRunning) return;
     
         this.isRunning = true;
-        
-        const publisher = initPublish(this.node, 'geometry_msgs/msg/Twist', this.topic);
+
+        const publisher = initPublish(this.node, 'geometry_msgs/msg/PoseWithCovarianceStamped', this.topic);
         this.node.spin();
 
-        this.mqtt.subscribe('wavem/1/cmd_vel');
+        this.mqtt.subscribe('wavem/1/initialpose');
         this.mqtt.client.on("message", (topic, message) => {
             try {
-                log.info(`RCL cmd_vel publish MQTT onMessage topic : ${topic}, message : ${message}`);
-                if(topic.includes('cmd_vel')) {
-                    let msg = this.genTwistMsg(message.toString());
+                log.info(`RCL initialpose publish MQTT onMessage topic : ${topic}, message : ${message}`);
+                if(topic.includes('initialpose')) {
+                    let msg = this.genPWCSMsg();
                     publisher.publish(msg);
                 } else return;
             } catch (error) {
-                log.error(`RCL publish cmd_vel error : ${error}`);
+                log.error(`RCL publish initialpose error : ${error}`);
             }
         });
     };
@@ -94,25 +94,19 @@ export default class CmdVelPublisher implements Publisher {
 
     /**
      * protected function for generate ROS2 publishing message object
-     * @see rclnodejs.geometry_msgs.msg.Twist
+     * @see rclnodejs.geemetry_msgs.msg.PoseWithCovarianceStamped
      * @param message : any
-     * @returns twistMsg : rclnodejs.geometry_msgs.msg.Twist
+     * @returns pwscMsg : rclnodejs.geometry_msgs.msg.PoseWithCovarianceStamped
      */
-    protected genTwistMsg(message: any): rclnodejs.geometry_msgs.msg.Twist {
-        let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist') as rclnodejs.geometry_msgs.msg.Twist;
+    protected genPWCSMsg(): rclnodejs.geometry_msgs.msg.PoseWithCovarianceStamped {
+        let pwscMsg = rclnodejs.createMessageObject('geometry_msgs/msg/PoseWithCovarianceStamped') as rclnodejs.geometry_msgs.msg.PoseWithCovarianceStamped;
 
-        const twist = JSON.parse(message);
+        // const pwscs = JSON.parse(message);
+        pwscMsg.header.frame_id = 'initial_pose';
+        pwscMsg.pose.pose.position = {x:0, y:0, z:0};
+        pwscMsg.pose.pose.orientation = {x:0,y:0,z:0,w:0};
+        pwscMsg.pose.covariance = [1,2,3];
 
-        if((twist.linear === null || twist.linear === '') || (twist.angular === null || twist.angular === '')) {
-            twistMsg.linear = {x:0,y:0,z:0};
-            twistMsg.angular = {x:0,y:0,z:0};
-            throw new Error('RCL cmdVel publish values is empty...');
-        };
-
-        twistMsg.linear = twist.linear;
-        twistMsg.angular = twist.angular;
-
-        return twistMsg;
+        return pwscMsg;
     };
-};
-
+}

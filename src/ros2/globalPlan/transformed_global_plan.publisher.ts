@@ -21,11 +21,10 @@ import { Publisher } from '../common/common_ndoe.interface';
 import { initPublish } from '../common/common_node.infra';
 
 /**
- * Class for ROS2 publish /cmd_vel topic to robot
+ * Class for ROS2 publish /transformed_global_plan topic to robot
  * @see rclnodejs.Publisher
  */
-export default class CmdVelPublisher implements Publisher {
-
+export default class TransformedGlobalPlanPublisher implements Publisher {
     /**
      * private boolean filed for this node is running or not
      */
@@ -51,7 +50,7 @@ export default class CmdVelPublisher implements Publisher {
      * @param mqtt : Mqtt
      */
     constructor(private readonly topic:string, mqtt:Mqtt) {
-        this.node = new rclnodejs.Node('cmd_vel_publisher');
+        this.node = new rclnodejs.Node('local_plan_publisher');
         this.mqtt = mqtt;
     };
 
@@ -66,19 +65,19 @@ export default class CmdVelPublisher implements Publisher {
     
         this.isRunning = true;
         
-        const publisher = initPublish(this.node, 'geometry_msgs/msg/Twist', this.topic);
+        const publisher = initPublish(this.node, 'nav_msgs/msg/Path', this.topic);
         this.node.spin();
 
-        this.mqtt.subscribe('wavem/1/cmd_vel');
+        this.mqtt.subscribe('wavem/1/transformed_global_plan');
         this.mqtt.client.on("message", (topic, message) => {
             try {
-                log.info(`RCL cmd_vel publish MQTT onMessage topic : ${topic}, message : ${message}`);
-                if(topic.includes('cmd_vel')) {
-                    let msg = this.genTwistMsg(message.toString());
+                log.info(`RCL transformed_global_plan publish MQTT onMessage topic : ${topic}, message : ${message}`);
+                if(topic.includes('transformed_global_plan')) {
+                    let msg = this.genPathMsg(message.toString());
                     publisher.publish(msg);
                 } else return;
             } catch (error) {
-                log.error(`RCL publish cmd_vel error : ${error}`);
+                log.error(`RCL publish transformed_global_plan error : ${error}`);
             }
         });
     };
@@ -88,31 +87,24 @@ export default class CmdVelPublisher implements Publisher {
      */
     stop(): void {
         this.isRunning = false;
-        this.mqtt.client.unsubscribe('wavem/1/cmd_vel');
+        this.mqtt.client.unsubscribe('wavem/1/transformed_global_plan');
         this.node.destroy();
     };
 
     /**
      * protected function for generate ROS2 publishing message object
-     * @see rclnodejs.geometry_msgs.msg.Twist
+     * @see rclnodejs.nav_msgs.msg.Path
      * @param message : any
-     * @returns twistMsg : rclnodejs.geometry_msgs.msg.Twist
+     * @returns pathMsg : rclnodejs.nav_msgs.msg.Path
      */
-    protected genTwistMsg(message: any): rclnodejs.geometry_msgs.msg.Twist {
-        let twistMsg = rclnodejs.createMessageObject('geometry_msgs/msg/Twist') as rclnodejs.geometry_msgs.msg.Twist;
+    protected genPathMsg(message: any): rclnodejs.nav_msgs.msg.Path {
+        let pathMsg = rclnodejs.createMessageObject('nav_msgs/msg/Path') as rclnodejs.nav_msgs.msg.Path;
 
-        const twist = JSON.parse(message);
+        const path = JSON.parse(message);
 
-        if((twist.linear === null || twist.linear === '') || (twist.angular === null || twist.angular === '')) {
-            twistMsg.linear = {x:0,y:0,z:0};
-            twistMsg.angular = {x:0,y:0,z:0};
-            throw new Error('RCL cmdVel publish values is empty...');
-        };
+        pathMsg.header.frame_id = path.frame_id;
+        pathMsg.poses = path.poses;
 
-        twistMsg.linear = twist.linear;
-        twistMsg.angular = twist.angular;
-
-        return twistMsg;
+        return pathMsg;
     };
 };
-

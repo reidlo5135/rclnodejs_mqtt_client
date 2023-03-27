@@ -7,7 +7,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "tank_all": "nodemon src/ros2/launch/tankAll/overall_tank_all.ts",
-    "ros_one_ready": "nodemon src/ros2/launch/ros_one_ready/overall_ros_one_ready.ts",
+    "ros_one_ready": "nodemon src/ros2/launch/rosOneReady/overall_ros_one_ready.ts",
     "build": "tsc"
   },
   "bin": {

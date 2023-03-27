@@ -16,13 +16,14 @@
 
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../../mqtt/mqtt.infra';
+import { Publisher } from '../../common/common_ndoe.interface';
 import { initPublish } from '../../common/common_node.infra';
 
 /**
  * Class for ROS2 publish /laser_frame topic to robot
  * @see rclnodejs.Publisher
  */
-export default class LaserScanPublisher {
+export default class LaserScanPublisher implements Publisher {
 
   /**
    * private boolean field for this node is running or not
@@ -34,12 +35,6 @@ export default class LaserScanPublisher {
    */
   private readonly node: rclnodejs.Node;
 
-  /**
-   * private readonly field for rclnodejs.Publisher<'sensor_msgs/msg/LaserScan'> instance
-   * @see rclnodejs.Publisher
-   * @see sensor_msgs/msgs/LaserScan
-   */
-  private readonly publisher: rclnodejs.Publisher<'sensor_msgs/msg/LaserScan'>;
 
   /**
    * private field for publishTimer
@@ -58,15 +53,12 @@ export default class LaserScanPublisher {
    * @see node
    * @see publisher
    * @see mqtt
-   * @see initPublish
    * @param topic : string
    * @param mqtt : Mqtt
    */
   constructor(private readonly topic:string, mqtt:Mqtt) {
     this.node = new rclnodejs.Node('laser_scan_publisher');
-    this.publisher = initPublish(this.node, 'sensor_msgs/msg/LaserScan', topic);
     this.mqtt = mqtt;
-    this.node.spin();
   };
 
   /**
@@ -74,6 +66,7 @@ export default class LaserScanPublisher {
    * @see genLaserScanMsg
    * @see publisherTimer
    * @see createTimer
+   * @see initPublish
    * @param interval : number
    */
   start(interval = 1000): void {
@@ -81,12 +74,13 @@ export default class LaserScanPublisher {
 
     this.isRunning = true;
 
-    let msg = this.genLaserScanMsg();
+    const publisher = initPublish(this.node, 'sensor_msgs/msg/LaserScan', this.topic);
+    this.node.spin();
 
+    let msg = this.genLaserScanMsg();
     this.publisherTimer = this.node.createTimer(interval, () => {
-      this.publisher.publish(msg);
+      publisher.publish(msg);
     });
-    // publish('wavem/1/laser_frame', this.publisher, msg, this.mqtt);
   };
 
   /**
@@ -96,6 +90,7 @@ export default class LaserScanPublisher {
     this.publisherTimer.cancel();
     this.publisherTimer = null;
     this.isRunning = false;
+    this.node.destroy();
   };
 
   /**

@@ -85,6 +85,19 @@ export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt
  */
 export function client(node:rclnodejs.Node, msg_type:any, service:string) : rclnodejs.Client<any> {
     log.info(`RCL client msg_type : ${msg_type}, service : ${service}`);
-
     return node.createClient(msg_type, service);
+};
+
+/**
+ * function for ROS2 action client
+ * @see rclnodejs.Node
+ * @see rclnodejs.ActionClient<any>
+ * @param node : rclnodejs.Node
+ * @param msg_type : any
+ * @param action : string
+ * @returns rclnodejs.ActionClient<any>
+ */
+export function actionClient(node:rclnodejs.Node, msg_type:any, action:string) : rclnodejs.ActionClient<any> {
+    log.info(`RCL action client msg_type : ${msg_type}, action : ${action}`);
+    return new rclnodejs.ActionClient(node, msg_type, action);
 };

@@ -24,6 +24,10 @@ import OdometrySubscriber from "../../odom/odometry.subscriber";
 import RobotPoseSubscriber from "../../robotPose/robot_pose.subscriber";
 import LaserScanPublisher from "../../scan/laserScan/laser_frame.publisher";
 import JointStatesPublisher from "../../jointStates/joint_states.publisher";
+import TfStaticSubscriber from "../../tf/tf_static.subscriber";
+import InitialPosePublisher from "../../initialPose/initialpose.publisher";
+import TransformedGlobalPlanPublisher from "../../globalPlan/transformed_global_plan.publisher";
+import LocalPlanPublisher from "../../localPlan/local_plan.publisher";
 
 /**
  * async function for run Overall ROS2-MQTT Client
@@ -41,11 +45,13 @@ async function run() {
      */
     const mqtt:Mqtt = new Mqtt();  
 
+    // Publishing Area
+
     /**
      * const instance for LaserScanPublihser class
      * @see LaserScanPublihser
      * @see LaserScanPublihser.start
-     * @see mqtt
+     * @see Mqtt
      */
     const laserScanPublisher = new LaserScanPublisher('laser_frame', mqtt);
     laserScanPublisher.start();
@@ -54,7 +60,7 @@ async function run() {
      * const instance for JointStatesPublisher class
      * @see JointStatesPublisher
      * @see JointStatesPublisher.start
-     * @see mqtt
+     * @see Mqtt
      */
     const jointStatesPublisher = new JointStatesPublisher('joint_states', mqtt);
     jointStatesPublisher.start();  
@@ -63,10 +69,40 @@ async function run() {
      * const instance for CmdVelPublisher class
      * @see CmdVelPublisher
      * @see CmdVelPublisher.start
-     * @see mqtt
+     * @see Mqtt
      */
     const cmdVelPublisher = new CmdVelPublisher('cmd_vel', mqtt);
     cmdVelPublisher.start();
+
+    /**
+     * const instance for InitialPosePublisher class
+     * @see InitialPosePublisher
+     * @see InitialPosePublisher.start
+     * @see Mqtt
+     */
+    const initialPosePublisher = new InitialPosePublisher('initialpose', mqtt);
+    initialPosePublisher.start();
+
+    /**
+     * const instance for TransformedGlobalPlanPublisher class
+     * @see TransformedGlobalPlanPublisher
+     * @see TransformedGlobalPlanPublisher.start
+     * @see Mqtt
+     */
+    const transformedGlobalPlanPublisher = new TransformedGlobalPlanPublisher('transformed_global_plan', mqtt);
+    transformedGlobalPlanPublisher.start();
+
+    /**
+     * const instance for LocalPlanPublisher class
+     * @see LocalPlanPublisher
+     * @see LocalPlanPublisher.start
+     * @see Mqtt
+     */
+    const localPlanPublisher = new LocalPlanPublisher('local_plan', mqtt);
+    localPlanPublisher.start();
+
+
+    // Subscription Area
     
     /**
      * const instance for ImuDataSubscriber class
@@ -107,6 +143,14 @@ async function run() {
      */
     const tf = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
     tf.start();
+
+    /**
+     * const instance for TfStaticSubscriber class
+     * @see TfStaticSubscriber
+     * @see Mqtt
+     */
+    const tfStatic = new TfStaticSubscriber('/tf_static', 'tf2_msgs/msg/TFMessage', mqtt);
+    tfStatic.start();
 
     /**
      * const instance for MapClient
