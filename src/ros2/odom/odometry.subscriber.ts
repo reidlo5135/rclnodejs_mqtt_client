@@ -50,20 +50,18 @@ export default class OdometrySubscriber implements Subscriber{
      * @param type : any
      * @param mqtt : Mqtt
      */
-    constructor(private readonly topic:string, private readonly type:any, mqtt:Mqtt) {
-        this.node = new rclnodejs.Node('odom_subscriber');
+    constructor(private readonly master:rclnodejs.Node, private readonly topic:string, private readonly type:any, mqtt:Mqtt) {
+        this.node = master;
         this.mqtt = mqtt;
     };
 
     start(): void {
         this.isRunning = true;
         subscribe(this.node, this.type, this.topic, this.mqtt);
-        this.node.spin();
     };
 
     stop(): void {
         this.isRunning = false;
         this.mqtt.client.unsubscribe(this.topic);
-        this.node.destroy();
     };
 };
