@@ -79,8 +79,8 @@ async function run() {
      * @see OdometrySubscriber
      * @see Mqtt
      */
-    const odom = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
-    odom.start();
+    // const odom = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
+    // odom.start();
 
     /**
      * const instance for ScanSubscriber class
