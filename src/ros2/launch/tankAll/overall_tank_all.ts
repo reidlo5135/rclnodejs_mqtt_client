@@ -32,6 +32,7 @@ async function run() {
      * await function for rclnodejs.init();
      */
     await rclnodejs.init();
+    const master = new rclnodejs.Node('mqtt_tank_all');
 
     /**
      * const instance for mqtt class
@@ -79,8 +80,8 @@ async function run() {
      * @see OdometrySubscriber
      * @see Mqtt
      */
-    // const odom = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
-    // odom.start();
+    const odom = new OdometrySubscriber(master, '/odom', 'nav_msgs/msg/Odometry', mqtt);
+    odom.start();
 
     /**
      * const instance for ScanSubscriber class
