@@ -40,25 +40,7 @@ class MasterClientLaunch {
     };
 
     private runSubscriptions(master: rclnodejs.Node) {
-        // this.mqtt.subscribe('JaraTwo/1/request');
         this.mqtt.subscribe('ros_message_init');
-        const arr = [
-            {
-              "messageType":"nav_msgs/msg/OccupancyGrid",
-              "name":"/map",
-              "type":"sub"
-            },
-            {
-              "messageType":"nav2_msgs/msg/NavigationToGoal",
-              "name":"/navigationToGoal",
-              "type":"action"
-            },
-            {
-                "messageType":"nav_msgs/msg/Odometry",
-                "name":"/odom",
-                "type":"sub"
-            }
-        ];
 
         const reqType: requestType = {
             pub : 'pub',
