@@ -40,7 +40,7 @@ const logFormat = printf(({ level, message, label, timestamp }) => {
 export const log = winston.createLogger({
     format: combine(
        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-       label({ label: 'ros2_ugv_server' }),
+       label({ label: 'ros2_mqtt_client' }),
        logFormat,
     ),
     transports: [

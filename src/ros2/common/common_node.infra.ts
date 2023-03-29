@@ -62,15 +62,13 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
  * @param mqtt : Mqtt
  * @returns rclnodejs.Subscription
  */
-export function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : rclnodejs.Subscription {
+export async function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : Promise<void> {
     log.info(`RCL subscription message type : ${type}, topic : ${topic} `);
-    
-    const subscription = node.createSubscription(type, topic, (msg) => {
+
+    node.createSubscription(type, topic, (msg) => {
         if(msg === null || msg === '') log.error(`RCL ${topic} subscription has return empty message`);
         mqtt.publish(`wavem/1${topic}`, JSON.stringify(msg));
     });
-
-    return subscription;
 };
 
 /**

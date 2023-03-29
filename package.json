@@ -8,6 +8,7 @@
   "scripts": {
     "tank_all": "nodemon src/ros2/launch/tankAll/overall_tank_all.ts",
     "ros_one_ready": "nodemon src/ros2/launch/rosOneReady/overall_ros_one_ready.ts",
+    "master_client_launch": "nodemon src/ros2/launch/master/master_client.launch.ts",
     "build": "tsc"
   },
   "bin": {

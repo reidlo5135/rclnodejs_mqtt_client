@@ -22,8 +22,6 @@ import CmdVelPublisher from "../../cmdVel/cmd_vel.publisher";
 import ImuDataSubscriber from "../../imu/imu_data.subscriber";
 import OdometrySubscriber from "../../odom/odometry.subscriber";
 import RobotPoseSubscriber from "../../robotPose/robot_pose.subscriber";
-import LaserScanPublisher from "../../scan/laserScan/laser_frame.publisher";
-import JointStatesPublisher from "../../jointStates/joint_states.publisher";
 import TfStaticSubscriber from "../../tf/tf_static.subscriber";
 import InitialPosePublisher from "../../initialPose/initialpose.publisher";
 import TransformedGlobalPlanPublisher from "../../globalPlan/transformed_global_plan.publisher";
@@ -38,7 +36,6 @@ async function run() {
      * await function for rclnodejs.init();
      */
     await rclnodejs.init();
-    const master = new rclnodejs.Node('mqtt_ros_one_ready');
 
     /**
      * const instance for mqtt class
@@ -48,23 +45,23 @@ async function run() {
 
     // Publishing Area
 
-    /**
-     * const instance for LaserScanPublihser class
-     * @see LaserScanPublihser
-     * @see LaserScanPublihser.start
-     * @see Mqtt
-     */
-    const laserScanPublisher = new LaserScanPublisher('laser_frame', mqtt);
-    laserScanPublisher.start();
+    // /**
+    //  * const instance for LaserScanPublihser class
+    //  * @see LaserScanPublihser
+    //  * @see LaserScanPublihser.start
+    //  * @see Mqtt
+    //  */
+    // const laserScanPublisher = new LaserScanPublisher('laser_frame', mqtt);
+    // laserScanPublisher.start();
 
-    /**
-     * const instance for JointStatesPublisher class
-     * @see JointStatesPublisher
-     * @see JointStatesPublisher.start
-     * @see Mqtt
-     */
-    const jointStatesPublisher = new JointStatesPublisher('joint_states', mqtt);
-    jointStatesPublisher.start();  
+    // /**
+    //  * const instance for JointStatesPublisher class
+    //  * @see JointStatesPublisher
+    //  * @see JointStatesPublisher.start
+    //  * @see Mqtt
+    //  */
+    // const jointStatesPublisher = new JointStatesPublisher('joint_states', mqtt);
+    // jointStatesPublisher.start();  
 
     /**
      * const instance for CmdVelPublisher class
@@ -118,40 +115,40 @@ async function run() {
      * @see OdometrySubscriber
      * @see Mqtt
      */
-    const odom = new OdometrySubscriber(master, '/odom', 'nav_msgs/msg/Odometry', mqtt);
-    odom.start();
+    const odomSubscriber = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
+    odomSubscriber.start();
 
     /**
      * const instance for RobotPoseSubscriber class
      * @see RobotPoseSubscriber
      * @see Mqtt
      */
-    const robotPose = new RobotPoseSubscriber('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
-    robotPose.start();
+    const robotPoseSubscriber = new RobotPoseSubscriber('/robot_pose', 'geometry_msgs/msg/Pose', mqtt);
+    robotPoseSubscriber.start();
 
     /**
      * const instance for ScanSubscriber class
      * @see RobotPoseSubscriber
      * @see Mqtt
      */
-    const scan = new ScanSubscriber('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
-    scan.start();
+    const scanSubscriber = new ScanSubscriber('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
+    scanSubscriber.start();
 
     /**
      * const instance for TfSubscriber class
      * @see TfSubscriber
      * @see Mqtt
      */
-    const tf = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
-    tf.start();
+    const tfSubscriber = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
+    tfSubscriber.start();
 
     /**
      * const instance for TfStaticSubscriber class
      * @see TfStaticSubscriber
      * @see Mqtt
      */
-    const tfStatic = new TfStaticSubscriber('/tf_static', 'tf2_msgs/msg/TFMessage', mqtt);
-    tfStatic.start();
+    const tfStaticSubscriber = new TfStaticSubscriber('/tf_static', 'tf2_msgs/msg/TFMessage', mqtt);
+    tfStaticSubscriber.start();
 
     /**
      * const instance for MapClient

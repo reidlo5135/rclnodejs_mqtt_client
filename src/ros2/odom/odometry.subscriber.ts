@@ -16,6 +16,7 @@
 
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
+import { log } from '../common/common_logger.infra';
 import { Subscriber } from '../common/common_ndoe.interface';
 import { subscribe } from '../common/common_node.infra';
 
@@ -50,14 +51,18 @@ export default class OdometrySubscriber implements Subscriber{
      * @param type : any
      * @param mqtt : Mqtt
      */
-    constructor(private readonly master:rclnodejs.Node, private readonly topic:string, private readonly type:any, mqtt:Mqtt) {
-        this.node = master;
+    constructor(private readonly topic:string, private readonly type:any, mqtt:Mqtt) {
+        this.node = new rclnodejs.Node('odom_subscriber');
         this.mqtt = mqtt;
     };
 
     start(): void {
-        this.isRunning = true;
-        subscribe(this.node, this.type, this.topic, this.mqtt);
+        try {
+            this.isRunning = true;
+            subscribe(this.node, this.type, this.topic, this.mqtt);
+        } catch (error) {
+            log.error(`odom subscription error : ${error}`);
+        };
     };
 
     stop(): void {

@@ -32,7 +32,7 @@ async function run() {
      * await function for rclnodejs.init();
      */
     await rclnodejs.init();
-    const master = new rclnodejs.Node('mqtt_tank_all');
+    const master = new rclnodejs.Node('mqtt_master_ros_one_ready');
 
     /**
      * const instance for mqtt class
@@ -72,32 +72,32 @@ async function run() {
      * @see ImuDataSubscriber
      * @see Mqtt
      */
-    const imuData = new ImuDataSubscriber('/imu/data', 'sensor_msgs/msg/Imu', mqtt);
-    imuData.start();
+    const imuDataSubscriber = new ImuDataSubscriber('/imu/data', 'sensor_msgs/msg/Imu', mqtt);
+    imuDataSubscriber.start();
 
     /**
      * const instacne for OdometrySubscriber class
      * @see OdometrySubscriber
      * @see Mqtt
      */
-    const odom = new OdometrySubscriber(master, '/odom', 'nav_msgs/msg/Odometry', mqtt);
-    odom.start();
+    const odomSubscriber = new OdometrySubscriber('/odom', 'nav_msgs/msg/Odometry', mqtt);
+    odomSubscriber.start();
 
     /**
      * const instance for ScanSubscriber class
      * @see RobotPoseSubscriber
      * @see Mqtt
      */
-    const scan = new ScanSubscriber('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
-    scan.start();
+    const scanSubscriber = new ScanSubscriber('/scan', 'sensor_msgs/msg/LaserScan', mqtt);
+    scanSubscriber.start();
 
     /**
      * const instance for TfSubscriber class
      * @see TfSubscriber
      * @see Mqtt
      */
-    const tf = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
-    tf.start();
+    const tfSubscriber = new TfSubscriber('/tf', 'tf2_msgs/msg/TFMessage', mqtt);
+    tfSubscriber.start();
 };
 
 /**

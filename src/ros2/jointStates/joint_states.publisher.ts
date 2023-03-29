@@ -70,7 +70,7 @@ export default class JointStatesPublisher implements Publisher {
     const publisher = initPublish(this.node, 'sensor_msgs/msg/JointState', this.topic);
     this.node.spin();
     let msg = this.genJointStatesMsg();
-    publish('wavem/1/joint_states', publisher, msg, this.mqtt);
+    // publish('wavem/1/joint_states', publisher, msg, this.mqtt);
   };
 
   /**
