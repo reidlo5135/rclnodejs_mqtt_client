@@ -24,14 +24,12 @@ import { requestType } from '../../common/type/request.type';
  */
 class MasterClientLaunch {
 
-    private readonly mqtt:Mqtt;
-
     constructor() {
-        this.mqtt = new Mqtt();
         rclnodejs.init()
             .then(() => {
                 const master = new rclnodejs.Node('master_mqtt_client_launch');
-                this.runSubscriptions(master);
+                const mqtt:Mqtt = new Mqtt();
+                this.runSubscriptions(master, mqtt);
                 master.spin();
             })
             .catch((err) => {
@@ -39,8 +37,8 @@ class MasterClientLaunch {
             });
     };
 
-    private runSubscriptions(master: rclnodejs.Node) {
-        this.mqtt.subscribe('ros_message_init');
+    private runSubscriptions(master: rclnodejs.Node, mqtt:Mqtt) {
+        mqtt.subscribe('ros_message_init');
 
         const reqType: requestType = {
             pub : 'pub',
@@ -49,13 +47,13 @@ class MasterClientLaunch {
             service : 'service'
         };
 
-        this.mqtt.client.on('message', (mqttTopic:string, payload:string) => {
+        mqtt.client.on('message', (mqttTopic:string, payload:string) => {
             log.info(`RCL Master runSubscription topic : ${mqttTopic}, payload : ${payload}`);
             const json = JSON.parse(payload);            
             for(let raw of json) {
                 log.info(`RCL Master arr : ${JSON.stringify(raw)}`);
                 if(raw.type === reqType.sub)  {
-                    subscribe(master, raw.message_type, raw.name, this.mqtt)
+                    subscribe(master, raw.message_type, raw.name, mqtt)
                         .then(() => {
                             log.info(`RCL ${raw.type} is subscribing on ${raw.name}`);
                         })
@@ -86,7 +84,7 @@ function welcome() {
     console.log(' | | \\ \\| |__| |____) |/ /_  | |  | | |__| | | |     | |    | |____| |____ _| |_| |____| |\\  |  | |   ');
     console.log(' |_|  \\_\\\\____/|_____/|____| |_|  |_|\\___\\_\\ |_|     |_|     \\_____|______|_____|______|_| \\_|  |_|   ');
     console.log('                                                                                                      ');
-    log.info('ROS2-MQTT [ROS-ONE-READY] Client is ready for RCL!!');
+    log.info('ROS2-MQTT [MASTER] Client is ready for RCL!!');
 };
 
 /**
@@ -96,7 +94,7 @@ function welcome() {
 (async function main(): Promise<void> {
     run()
     .then(() => welcome())
-    .catch((err) => log.error(`ROS2-MQTT [ROS-ONE-READY] Client has crashed by.. ${err} `));
+    .catch((err) => log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${err} `));
 })().catch((e): void => {
     log.error('overall_ros_one_ready error : ', e);
     process.exitCode = 1

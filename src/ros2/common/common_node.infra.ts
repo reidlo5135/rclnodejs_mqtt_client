@@ -63,7 +63,7 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
  * @returns rclnodejs.Subscription
  */
 export async function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : Promise<void> {
-    log.info(`RCL subscription message type : ${type}, topic : ${topic} `);
+    log.info(`RCL subscription message type : ${type}, topic : ${topic}, mqtt : ${mqtt.url}`);
 
     node.createSubscription(type, topic, (msg) => {
         if(msg === null || msg === '') log.error(`RCL ${topic} subscription has return empty message`);
