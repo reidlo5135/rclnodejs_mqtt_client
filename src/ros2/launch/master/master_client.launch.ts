@@ -16,7 +16,9 @@ import * as rclnodejs from 'rclnodejs';
 import Mqtt from "../../../mqtt/mqtt.infra";
 import { log } from "../../common/common_logger.infra";
 import { createROSPublisher, publishROS, createROSSubscription, createROSClient, callROSService } from '../../common/common_node.infra';
-import { requestType } from '../../common/type/request.type';
+import { rclType, requestType } from '../../common/type/request.type';
+import { IPublishPacket } from 'mqtt';
+import { error } from 'console';
 
 /**
  * Class for MQTT publish/subscribe & generate ROS2 publisher/subscriber/action/service
@@ -37,7 +39,8 @@ class MasterClientLaunch {
             });
     };
 
-    private runSubscriptions(master: rclnodejs.Node, mqtt:Mqtt) {
+    private async runSubscriptions(master: rclnodejs.Node, mqtt: Mqtt): Promise<void> {
+        mqtt.subscribe('/test');
         mqtt.subscribe('ros_message_init');
 
         const reqType: requestType = {
@@ -47,54 +50,46 @@ class MasterClientLaunch {
             service : 'service'
         };
 
-        mqtt.client.on('message', (mqttTopic:string, payload:string) => {
-            if(mqttTopic.includes('ros_message_init')) {
-                log.info(`RCL Master runSubscription topic : ${mqttTopic}, payload : ${payload}`);
-                const json = JSON.parse(payload);
-                for(let raw of json) {
-                    log.info(`RCL Master arr : ${JSON.stringify(raw)}`);
-                    if(raw.type === reqType.sub)  {
-                        createROSSubscription(master, raw.message_type, raw.name, mqtt)
-                            .then(() => {
-                                log.info(`RCL ${raw.type} is subscribing on ${raw.name}`);
-                            })
-                            .catch((error) => {
-                                log.error(`RCL subscription ${error}`);
-                            });
-                    } else if(raw.type === reqType.pub) {
-                        createROSPublisher(master, raw.message_type, raw.name)
-                            .then((publisher) => {
-                                publishROS(publisher, raw.type + raw.name, mqtt)
-                                    .then(() => {
-                                        log.info(`RCL ${raw.name} is publishing`);
-                                    })
-                                    .catch((error) => {
-                                        log.error(`RCL publishing ${error}`);
-                                    });
-                            })
-                            .catch((error) => {
-                                log.error(`RCL publishing ${error}`);
-                            });
-                    } else if(raw.type === reqType.action) {
-    
-                    } else if(raw.type === reqType.service) {
-                        createROSClient(master, raw.message_type, raw.name)
-                            .then((client) => {
-                                callROSService(client, raw.reqeust_type, mqttTopic, mqtt)
-                                    .then(() => {
-                                        log.info(`RCL ${raw.name} is callilng service`);
-                                    })
-                                    .catch((error) => {
-                                        log.error(`RCL ${raw.name} call service ${error}`);
-                                    });
-                            })
-                            .catch((error) => {
-                                log.error(`RCL service client ${error}`);
-                            });
-                    }
-                };
-            } else return ;
+        mqtt.client.on('message', (mqttTopic: string, payload: string, packet: IPublishPacket) => {
+            log.info(`RCL Master runSubscription topic : ${mqttTopic}, payload : ${payload}, packet : ${packet.payload}`);
+            
+            if(packet.topic === 'ros_message_init') {
+                try {
+                    const json = JSON.parse(payload);
+
+                    for(let raw of json) {
+                        log.info(`RCL Master arr : ${JSON.stringify(raw)}`);
+                        if(raw.type === reqType.sub)  {
+                            createROSSubscription(this.setRclType(reqType.sub, master, raw), mqtt);
+                        } else if(raw.type === reqType.pub) {
+                            createROSPublisher(this.setRclType(reqType.pub, master, raw), mqtt);
+                        } else if(raw.type === reqType.action) {
+        
+                        } else if(raw.type === reqType.service) {
+                            createROSClient(master, raw.message_type, raw.name)
+                                .then((client) => {
+                                    callROSService(client, raw.request_type, mqttTopic, mqtt);
+                                })
+                                .catch((error) => {
+                                    log.error(`RCL service client ${error}`);
+                                });
+                        };
+                    };
+                } catch (error) {
+                    log.error(`RCL ros_message_init ${error}`);
+                }
+            } else return;
         });
+    };
+
+    private setRclType(reqType: string, master: rclnodejs.Node, raw: any): rclType {
+        const rclType: rclType = {
+            rcl: reqType,
+            node: master,
+            messageType: raw.message_type,
+            name: raw.name
+        };
+        return rclType;
     };
 };
 
@@ -123,5 +118,5 @@ function welcome() {
     .catch((err) => log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${err} `));
 })().catch((e): void => {
     log.error('ROS2-MQTT [MASTER] error : ', e);
-    process.exitCode = 1
+    process.exit(1);
 });

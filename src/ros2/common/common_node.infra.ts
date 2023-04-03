@@ -17,19 +17,41 @@
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from '../../mqtt/mqtt.infra';
 import { log } from './common_logger.infra';
+import { rclType, requestType } from './type/request.type';
+
+const reqType: requestType = {
+    pub : 'pub',
+    sub : 'sub',
+    action : 'action',
+    service : 'service'
+};
 
 /**
  * function for create ROS2 Publisher
  * @see rclnodejs
  * @see rclnodejs.Publisher<any>
  * @param node : rclnodejs.Node
- * @param ros_message_type : any
+ * @param rosMessageType : any
  * @param topic : string
  * @returns rclnodejs.Publisher<any>
  */
-export async function createROSPublisher(node: rclnodejs.Node, ros_message_type:any, topic:string) : Promise<rclnodejs.Publisher<any>> {
-    log.info(`RCL init publish message type : ${ros_message_type}, topic : ${topic}`);
-    return node.createPublisher(ros_message_type, topic);
+export async function createROSPublisher(rclType: rclType, mqtt: Mqtt): Promise<void> {
+    log.info(`RCL createROSPublisher nodeType : ${JSON.stringify(rclType)}`);
+    const node = rclType.node;
+    const topic = rclType.name;
+    const rosPublisher = node.createPublisher(rclType.messageType, topic);
+    
+    try {
+        if(rclType.rcl === reqType.pub) {
+            mqtt.subscribe(topic);
+            mqtt.client.on('message', (mqttTopic, mqttMessage) => {
+                log.info(`RCL createROSPublisher MQTT onMessage topic : ${mqttTopic}, message : ${mqttMessage}`);
+                rosPublisher.publish(mqttMessage);
+            });
+        } else return;
+    } catch (error) {
+        log.error(`RCL createROSPublisher ${error}`);
+    }
 };
 
 /**
@@ -37,13 +59,13 @@ export async function createROSPublisher(node: rclnodejs.Node, ros_message_type:
  * @see rclnodejs.Publisher<any>
  * @see Mqtt
  * @param topic : string
- * @param ros_publisher : rclnodejs.Publisher<any>
+ * @param rosPublisher : rclnodejs.Publisher<any>
  * @param msg : any
  * @param mqtt : Mqtt
  */
-export async function publishROS(ros_publisher: rclnodejs.Publisher<any>, topic: string, mqtt: Mqtt): Promise<void> {
+export async function publishROS(rosPublisher: rclnodejs.Publisher<any>, topic: string, mqtt: Mqtt): Promise<void> {
     log.info(`RCL publish mqttTopic : ${topic}`);
-    mqtt.subscribeForROSPublisher(topic, ros_publisher);
+    mqtt.subscribeForROSPublisher(topic, rosPublisher);
 };
 
 /**
@@ -52,23 +74,26 @@ export async function publishROS(ros_publisher: rclnodejs.Publisher<any>, topic:
  * @see rclnodejs.Subscription
  * @see Mqtt
  * @param node : rclnodejs.Node
- * @param ros_message_type : any
+ * @param rosMessageType : any
  * @param topic : string
  * @param mqtt : Mqtt
  * @returns rclnodejs.Subscription
  */
-export async function createROSSubscription(node: rclnodejs.Node, ros_message_type:any, topic: string, mqtt: Mqtt) : Promise<void> {
-    log.info(`RCL subscription message type : ${ros_message_type}, topic : ${topic}, mqtt : ${mqtt.url}`);
+export async function createROSSubscription(rclType: rclType, mqtt: Mqtt) : Promise<void> {
+    log.info(`RCL subscription nodeType : ${JSON.stringify(rclType)}`);
+    const node = rclType.node;
+    const topic = rclType.name;
 
     try {
-        node.createSubscription(ros_message_type, topic, (message) => {
-            if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
-            mqtt.publish(`${topic}`, JSON.stringify(message));
-        });        
+        if(rclType.rcl === reqType.sub) {
+            node.createSubscription(rclType.messageType, topic, (message) => {
+                if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
+                mqtt.publish(`${topic}`, JSON.stringify(message));
+            }); 
+        } else return;
     } catch (error) {
-        log.error(`RCL subscription error : ${error}`);
+        log.error(`RCL createROSSubscription ${error}`);
     }
-    
 };
 
 /**
@@ -77,29 +102,29 @@ export async function createROSSubscription(node: rclnodejs.Node, ros_message_ty
  * @see rclnodejs.Client<any>
  * @see rclnodejs.Service
  * @param node : rclnodejs.Node
- * @param ros_message_type : any
+ * @param rosMessageType : any
  * @param ros_service : string
  * @returns rclnodejs.Client<any>
  */
-export async function createROSClient(node: rclnodejs.Node, ros_message_type:any, ros_service:string) : Promise<rclnodejs.Client<any>> {
-    log.info(`RCL client msg_type : ${ros_message_type}, service : ${ros_service}`);
-    return node.createClient(ros_message_type, ros_service);
+export async function createROSClient(node: rclnodejs.Node, rosMessageType:any, ros_service:string) : Promise<rclnodejs.Client<any>> {
+    log.info(`RCL client msg_type : ${rosMessageType}, service : ${ros_service}`);
+    return node.createClient(rosMessageType, ros_service);
 };
 
-export async function callROSService(ros_client: rclnodejs.Client<any>, request_type: any, mqttTopic: string, mqtt: Mqtt): Promise<void> {
-    const request = rclnodejs.createMessageObject(request_type);
+export async function callROSService(rosClient: rclnodejs.Client<any>, requestType: any, mqttTopic: string, mqtt: Mqtt): Promise<void> {
+    const request = rclnodejs.createMessageObject(requestType);
     mqtt.subscribe(mqttTopic);
     mqtt.client.on('message', (topic, message) => {
-        const service_name = ros_client.serviceName;
+        const service_name = rosClient.serviceName;
         log.info(`RCL callROSService MQTT onMessage topic : ${topic}, message : ${message}`);
         if(mqttTopic.includes(topic)) {
-            ros_client.waitForService(1000)
+            rosClient.waitForService(1000)
                 .then((result) => {
                     if(!result) {
                         log.error(`RCL ${service_name} is not available... check your ROS2 Launch Mode`);
                         return;
                     };
-                    ros_client.sendRequest(request, (response) => {
+                    rosClient.sendRequest(request, (response) => {
                         if(response === null) log.error(`RCL call ${service_name} service call has empty response `);
                         else {
                             log.info(`RCL call ${service_name} response : ${JSON.stringify(response)}`);
@@ -119,11 +144,11 @@ export async function callROSService(ros_client: rclnodejs.Client<any>, request_
  * @see rclnodejs.Node
  * @see rclnodejs.ActionClient<any>
  * @param node : rclnodejs.Node
- * @param msg_type : any
+ * @param messageType : any
  * @param action : string
  * @returns rclnodejs.ActionClient<any>
  */
-export async function creatROSActionClient(node:rclnodejs.Node, msg_type:any, action:string) : Promise<rclnodejs.ActionClient<any>> {
-    log.info(`RCL action client msg_type : ${msg_type}, action : ${action}`);
-    return new rclnodejs.ActionClient(node, msg_type, action);
+export async function creatROSActionClient(node:rclnodejs.Node, messageType:any, action:string) : Promise<rclnodejs.ActionClient<any>> {
+    log.info(`RCL action client msg_type : ${messageType}, action : ${action}`);
+    return new rclnodejs.ActionClient(node, messageType, action);
 };

@@ -37,7 +37,10 @@ export default class Mqtt {
      * @see onConnect
      */
     constructor() {
-        this.url = 'tcp://192.168.0.187:1883';
+        const url_jaraTwo = 'tcp://192.168.0.119:1883';
+        const url_wavem = 'tcp://192.168.0.187:1883';
+        const url_reidlo = 'tcp://192.168.0.132:1883';
+        this.url = url_reidlo;
         this.client = mqtt.connect(this.url);
         this.onConnect();
     };
@@ -78,12 +81,13 @@ export default class Mqtt {
      * @see Mqtt
      * @see client
      */
-    public subscribe(topic:string) {
+    public async subscribe(topic:string): Promise<void> {
         this.client.subscribe(topic, function(err, granted) {
             if (err) {
-                log.error(`RCL ${topic} subscribe Error Occurred Caused By ${err}`);
+                log.error(`MQTT ${topic} subscribe Error Occurred Caused By ${err}`);
                 return;
             };
+            log.info(`MQTT subscribe granted : ${granted[0].topic}`);
         });
     };
 
@@ -94,22 +98,16 @@ export default class Mqtt {
      * @see client
      * @see rclnodejs.Publisher<any>
      */
-    public subscribeForROSPublisher(topic: string, ros_publisher: rclnodejs.Publisher<any>) {
+    public subscribeForROSPublisher(topic: string, rosPublisher: rclnodejs.Publisher<any>) {
         log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
         if(topic.includes('pub')) {
             const parsedTopic = topic.split('/')[1];
-            this.client.subscribe(parsedTopic, function(err, granted) {
-                if (err) {
-                    log.error(`MQTT subscribeForROSPublisher Error Occurred Caused By ${err}`);
-                    return;
-                };
-                log.info(`MQTT subscribeForROSPublisher ${typeof granted}`, granted);
-            });
-            this.client.on("message", (mqttTopic, mqtt_message) => {
-                log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqtt_message}`);
+            this.subscribe(parsedTopic);
+            this.client.on("message", (mqttTopic, mqttMessage, packet) => {
+                log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqttMessage}`);
                 // log.info(`MQTT publish is Equal ${topic.includes(mqttTopic)}`);
                 if(topic.includes(mqttTopic)) {
-                    ros_publisher.publish(mqtt_message);
+                    rosPublisher.publish(mqttMessage);
                 } else return;
             });
         } else return;
