@@ -65,7 +65,11 @@ export default class Mqtt {
      * @see client 
      */
     public publish(topic:string, message:string) {
-        this.client.publish(topic, message);
+        try {
+            this.client.publish(topic, message);
+        } catch (error) {
+            log.error(`MQTT publisher errror : ${error}`);
+        }
     };
 
     /**
@@ -88,25 +92,26 @@ export default class Mqtt {
      * @param topic 
      * @see Mqtt
      * @see client
-     * @see rclnodejs.Publisher
+     * @see rclnodejs.Publisher<any>
      */
     public subscribeForROSPublisher(topic: string, ros_publisher: rclnodejs.Publisher<any>) {
         log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
-        this.client.subscribe(topic, function(err, granted) {
-            if (err) {
-                log.error(`MQTT subscribeForROSPublisher Error Occurred Caused By ${err}`);
-                return;
-            };
-
-            log.info(`MQTT subscribeForROSPublisher ${typeof granted}`, granted);
-            
-        });
-
-        this.client.on("message", (mqttTopic, mqtt_message) => {
-            log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqtt_message}`);
-            if(topic.includes(mqttTopic)) {
-                ros_publisher.publish(mqtt_message);
-            } else return;
-        });
+        if(topic.includes('pub')) {
+            const parsedTopic = topic.split('/')[1];
+            this.client.subscribe(parsedTopic, function(err, granted) {
+                if (err) {
+                    log.error(`MQTT subscribeForROSPublisher Error Occurred Caused By ${err}`);
+                    return;
+                };
+                log.info(`MQTT subscribeForROSPublisher ${typeof granted}`, granted);
+            });
+            this.client.on("message", (mqttTopic, mqtt_message) => {
+                log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqtt_message}`);
+                // log.info(`MQTT publish is Equal ${topic.includes(mqttTopic)}`);
+                if(topic.includes(mqttTopic)) {
+                    ros_publisher.publish(mqtt_message);
+                } else return;
+            });
+        } else return;
     };
 };

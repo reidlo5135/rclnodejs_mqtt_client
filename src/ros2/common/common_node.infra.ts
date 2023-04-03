@@ -60,10 +60,15 @@ export async function publishROS(ros_publisher: rclnodejs.Publisher<any>, topic:
 export async function createROSSubscription(node: rclnodejs.Node, ros_message_type:any, topic: string, mqtt: Mqtt) : Promise<void> {
     log.info(`RCL subscription message type : ${ros_message_type}, topic : ${topic}, mqtt : ${mqtt.url}`);
 
-    node.createSubscription(ros_message_type, topic, (message) => {
-        if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
-        mqtt.publish(`${topic}`, JSON.stringify(message));
-    });
+    try {
+        node.createSubscription(ros_message_type, topic, (message) => {
+            if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
+            mqtt.publish(`${topic}`, JSON.stringify(message));
+        });        
+    } catch (error) {
+        log.error(`RCL subscription error : ${error}`);
+    }
+    
 };
 
 /**
