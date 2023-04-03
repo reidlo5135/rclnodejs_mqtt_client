@@ -23,13 +23,13 @@ import { log } from './common_logger.infra';
  * @see rclnodejs
  * @see rclnodejs.Publisher<any>
  * @param node : rclnodejs.Node
- * @param type : any
+ * @param ros_message_type : any
  * @param topic : string
  * @returns rclnodejs.Publisher<any>
  */
-export function initPublish(node:rclnodejs.Node, type:any, topic:string) : rclnodejs.Publisher<any> {
-    log.info(`RCL init publish message type : ${type}, topic : ${topic}`);
-    return node.createPublisher(type, topic);
+export async function createROSPublisher(node: rclnodejs.Node, ros_message_type:any, topic:string) : Promise<rclnodejs.Publisher<any>> {
+    log.info(`RCL init publish message type : ${ros_message_type}, topic : ${topic}`);
+    return node.createPublisher(ros_message_type, topic);
 };
 
 /**
@@ -37,18 +37,13 @@ export function initPublish(node:rclnodejs.Node, type:any, topic:string) : rclno
  * @see rclnodejs.Publisher<any>
  * @see Mqtt
  * @param topic : string
- * @param publisher : rclnodejs.Publisher<any>
+ * @param ros_publisher : rclnodejs.Publisher<any>
  * @param msg : any
  * @param mqtt : Mqtt
  */
-export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:any, mqtt:Mqtt)  {
-    log.info(`RCL publish MQTT topic : ${topic}`);
-    mqtt.client.subscribe(topic, function(err, granted) {
-        if (err) {
-            log.error(`RCL publish subscribe Error Occurred Caused By ${err}`);
-            return;
-        };
-    });
+export async function publishROS(ros_publisher: rclnodejs.Publisher<any>, topic: string, mqtt: Mqtt): Promise<void> {
+    log.info(`RCL publish mqttTopic : ${topic}`);
+    mqtt.subscribeForROSPublisher(topic, ros_publisher);
 };
 
 /**
@@ -57,17 +52,17 @@ export function publish(topic:string, publisher:rclnodejs.Publisher<any>, msg:an
  * @see rclnodejs.Subscription
  * @see Mqtt
  * @param node : rclnodejs.Node
- * @param type : any
+ * @param ros_message_type : any
  * @param topic : string
  * @param mqtt : Mqtt
  * @returns rclnodejs.Subscription
  */
-export async function subscribe(node:rclnodejs.Node, type:any, topic:string, mqtt:Mqtt) : Promise<void> {
-    log.info(`RCL subscription message type : ${type}, topic : ${topic}, mqtt : ${mqtt.url}`);
+export async function createROSSubscription(node: rclnodejs.Node, ros_message_type:any, topic: string, mqtt: Mqtt) : Promise<void> {
+    log.info(`RCL subscription message type : ${ros_message_type}, topic : ${topic}, mqtt : ${mqtt.url}`);
 
-    node.createSubscription(type, topic, (msg) => {
-        if(msg === null || msg === '') log.error(`RCL ${topic} subscription has return empty message`);
-        mqtt.publish(`wavem/1${topic}`, JSON.stringify(msg));
+    node.createSubscription(ros_message_type, topic, (message) => {
+        if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
+        mqtt.publish(`${topic}`, JSON.stringify(message));
     });
 };
 
@@ -77,13 +72,41 @@ export async function subscribe(node:rclnodejs.Node, type:any, topic:string, mqt
  * @see rclnodejs.Client<any>
  * @see rclnodejs.Service
  * @param node : rclnodejs.Node
- * @param msg_type : any
- * @param service : string
+ * @param ros_message_type : any
+ * @param ros_service : string
  * @returns rclnodejs.Client<any>
  */
-export function client(node:rclnodejs.Node, msg_type:any, service:string) : rclnodejs.Client<any> {
-    log.info(`RCL client msg_type : ${msg_type}, service : ${service}`);
-    return node.createClient(msg_type, service);
+export async function createROSClient(node: rclnodejs.Node, ros_message_type:any, ros_service:string) : Promise<rclnodejs.Client<any>> {
+    log.info(`RCL client msg_type : ${ros_message_type}, service : ${ros_service}`);
+    return node.createClient(ros_message_type, ros_service);
+};
+
+export async function callROSService(ros_client: rclnodejs.Client<any>, request_type: any, mqttTopic: string, mqtt: Mqtt): Promise<void> {
+    const request = rclnodejs.createMessageObject(request_type);
+    mqtt.subscribe(mqttTopic);
+    mqtt.client.on('message', (topic, message) => {
+        const service_name = ros_client.serviceName;
+        log.info(`RCL callROSService MQTT onMessage topic : ${topic}, message : ${message}`);
+        if(mqttTopic.includes(topic)) {
+            ros_client.waitForService(1000)
+                .then((result) => {
+                    if(!result) {
+                        log.error(`RCL ${service_name} is not available... check your ROS2 Launch Mode`);
+                        return;
+                    };
+                    ros_client.sendRequest(request, (response) => {
+                        if(response === null) log.error(`RCL call ${service_name} service call has empty response `);
+                        else {
+                            log.info(`RCL call ${service_name} response : ${JSON.stringify(response)}`);
+                            mqtt.publish(`${service_name}`, response);
+                        }
+                    });
+                })
+                .catch((error) => {
+                    log.error(`RCL ${mqttTopic} service call ${error}`);
+                });
+        };
+    });
 };
 
 /**
@@ -95,7 +118,7 @@ export function client(node:rclnodejs.Node, msg_type:any, service:string) : rcln
  * @param action : string
  * @returns rclnodejs.ActionClient<any>
  */
-export function actionClient(node:rclnodejs.Node, msg_type:any, action:string) : rclnodejs.ActionClient<any> {
+export async function creatROSActionClient(node:rclnodejs.Node, msg_type:any, action:string) : Promise<rclnodejs.ActionClient<any>> {
     log.info(`RCL action client msg_type : ${msg_type}, action : ${action}`);
     return new rclnodejs.ActionClient(node, msg_type, action);
 };

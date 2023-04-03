@@ -90,7 +90,7 @@ export default class Mqtt {
      * @see client
      * @see rclnodejs.Publisher
      */
-    public subscribeForROSPublisher(topic: string, publisher: rclnodejs.Publisher<any>, msg:any) {
+    public subscribeForROSPublisher(topic: string, ros_publisher: rclnodejs.Publisher<any>) {
         log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
         this.client.subscribe(topic, function(err, granted) {
             if (err) {
@@ -102,9 +102,11 @@ export default class Mqtt {
             
         });
 
-        this.client.on("message", (topic, message) => {
-            log.info(`MQTT onMessage topic : ${topic}, message : ${message}`);
-            publisher.publish(msg);
+        this.client.on("message", (mqttTopic, mqtt_message) => {
+            log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqtt_message}`);
+            if(topic.includes(mqttTopic)) {
+                ros_publisher.publish(mqtt_message);
+            } else return;
         });
     };
 };
