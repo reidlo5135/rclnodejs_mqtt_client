@@ -14,17 +14,14 @@
   },
   "typedocOptions": {
     "entryPoints": [
-      "./src/mqtt/**",
-      "./src/ros2/**/**",
-      "./src/overall.ts",
-      "./src/overall.publishing.ts",
-      "./src/overall.subscription.ts"
+      "./src/mqtt/**/**",
+      "./src/ros2/**/**"
     ],
     "out": "./docs",
     "name":"Documents of ROS2-MQTT Client",
     "excludePrivate": false,
     "readme": "README.md",
-    "gitRevision": "Dev_Reidlo_230326"
+    "gitRevision": "Dev_Reidlo_230327"
   },
   "exclude": [
       "**/dist/**",

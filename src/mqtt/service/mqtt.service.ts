@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import mqtt from 'mqtt';
-import * as rclnodejs from 'rclnodejs';
-import { log } from '../ros2/common/common_logger.infra';
+import { log } from '../../ros2/common/infra/common_logger.infra';
 
 /**
  * Class for MQTT Connections
@@ -40,7 +39,7 @@ export default class Mqtt {
         const url_jaraTwo = 'tcp://192.168.0.119:1883';
         const url_wavem = 'tcp://192.168.0.187:1883';
         const url_reidlo = 'tcp://192.168.0.132:1883';
-        this.url = url_reidlo;
+        this.url = url_wavem;
         this.client = mqtt.connect(this.url);
         this.onConnect();
     };
@@ -87,29 +86,7 @@ export default class Mqtt {
                 log.error(`MQTT ${topic} subscribe Error Occurred Caused By ${err}`);
                 return;
             };
-            log.info(`MQTT subscribe granted : ${granted[0].topic}`);
+            log.info(`MQTT subscribe granted by topic [${granted[0].topic}]`);
         });
-    };
-
-    /**
-     * public void function for MQTT subscription & ROS Publishing
-     * @param topic 
-     * @see Mqtt
-     * @see client
-     * @see rclnodejs.Publisher<any>
-     */
-    public subscribeForROSPublisher(topic: string, rosPublisher: rclnodejs.Publisher<any>) {
-        log.info(`MQTT subscribeForROSPublisher topic : ${topic}`);
-        if(topic.includes('pub')) {
-            const parsedTopic = topic.split('/')[1];
-            this.subscribe(parsedTopic);
-            this.client.on("message", (mqttTopic, mqttMessage, packet) => {
-                log.info(`MQTT onMessage topic : ${mqttTopic}, message : ${mqttMessage}`);
-                // log.info(`MQTT publish is Equal ${topic.includes(mqttTopic)}`);
-                if(topic.includes(mqttTopic)) {
-                    rosPublisher.publish(mqttMessage);
-                } else return;
-            });
-        } else return;
     };
 };

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+'strict mode';
+
 import process from 'process';
 import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';

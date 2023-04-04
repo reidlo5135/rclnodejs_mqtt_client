@@ -12,26 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+'strict mode';
+
 import * as rclnodejs from 'rclnodejs';
-import Mqtt from "../../../mqtt/mqtt.infra";
-import { log } from "../../common/common_logger.infra";
-import { createROSPublisher, publishROS, createROSSubscription, createROSClient, callROSService } from '../../common/common_node.infra';
-import { rclType, requestType } from '../../common/type/request.type';
+import Mqtt from "../../mqtt/service/mqtt.service";
+import { log } from "../common/infra/common_logger.infra";
+import { createROSPublisher, createROSSubscription, createROSServiceClient, requestROSServiceServer, createROSActionClient, requestROSActionServer } from '../common/service/common_node.service';
+import { MQTTRequest } from '../../mqtt/type/mqtt_request.type';
 import { IPublishPacket } from 'mqtt';
-import { error } from 'console';
 
 /**
  * Class for MQTT publish/subscribe & generate ROS2 publisher/subscriber/action/service
- * @see Mqtt
- */
+ * @author wavem-reidlo
+ * @version 1.0.0
+ * @since 2023/03/31
+*/
 class MasterClientLaunch {
 
+    /**
+     * constructor for create master rcl node & initialize Mqtt class instance & invoke this runRCL
+     * @see rclnodejs.Node
+     * @see Mqtt
+     * @see runRCL
+     */
     constructor() {
         rclnodejs.init()
             .then(() => {
                 const master = new rclnodejs.Node('master_mqtt_client_launch');
                 const mqtt:Mqtt = new Mqtt();
-                this.runSubscriptions(master, mqtt);
+                this.runRCL(master, mqtt);
                 master.spin();
             })
             .catch((err) => {
@@ -39,36 +48,48 @@ class MasterClientLaunch {
             });
     };
 
-    private async runSubscriptions(master: rclnodejs.Node, mqtt: Mqtt): Promise<void> {
-        mqtt.subscribe('/test');
-        mqtt.subscribe('ros_message_init');
+    /**
+     * private async function for MQTT init subscribe & filter MQTT payload for run RCL
+     * @see rclnodejs.Node
+     * @see Mqtt
+     * @see MQTTRequest
+     * @see IPublishPacket
+     * @param master : rclnodejs.Node
+     * @param mqtt : MQTT
+     */
+    private async runRCL(master: rclnodejs.Node, mqtt: Mqtt) : Promise<void> {
+        const defaultTopic: string = 'ros_message_init';
+        mqtt.subscribe(defaultTopic);
 
-        const reqType: requestType = {
+        const reqType: MQTTRequest = {
             pub : 'pub',
             sub : 'sub',
             action : 'action',
             service : 'service'
         };
 
-        mqtt.client.on('message', (mqttTopic: string, payload: string, packet: IPublishPacket) => {
-            log.info(`RCL Master runSubscription topic : ${mqttTopic}, payload : ${payload}, packet : ${packet.payload}`);
-            
-            if(packet.topic === 'ros_message_init') {
+        mqtt.client.on('message', (mqttTopic: string, mqttMessage: string, mqttPacket: IPublishPacket) => {           
+            if(mqttPacket.topic === 'ros_message_init') {
                 try {
-                    const json = JSON.parse(payload);
+                    const json = JSON.parse(mqttMessage);
 
                     for(let raw of json) {
-                        log.info(`RCL Master arr : ${JSON.stringify(raw)}`);
                         if(raw.type === reqType.sub)  {
-                            createROSSubscription(this.setRclType(reqType.sub, master, raw), mqtt);
+                            createROSSubscription(master, raw.message_type, raw.name, mqtt);
                         } else if(raw.type === reqType.pub) {
-                            createROSPublisher(this.setRclType(reqType.pub, master, raw), mqtt);
+                            createROSPublisher(master, raw.message_type, raw.name, mqtt);                        
                         } else if(raw.type === reqType.action) {
-        
-                        } else if(raw.type === reqType.service) {
-                            createROSClient(master, raw.message_type, raw.name)
+                            createROSActionClient(master, raw.message_type, raw.name)
                                 .then((client) => {
-                                    callROSService(client, raw.request_type, mqttTopic, mqtt);
+                                    requestROSActionServer(client!, raw.name, raw.name, mqtt);
+                                })
+                                .catch((error) => {
+                                    log.error(`RCL request action server ${error}`);
+                                });
+                        } else if(raw.type === reqType.service) {
+                            createROSServiceClient(master, raw.message_type, raw.name)
+                                .then((client) => {
+                                    requestROSServiceServer(client!, raw.request_type, mqttTopic, mqtt);
                                 })
                                 .catch((error) => {
                                     log.error(`RCL service client ${error}`);
@@ -76,27 +97,24 @@ class MasterClientLaunch {
                         };
                     };
                 } catch (error) {
-                    log.error(`RCL ros_message_init ${error}`);
+                    log.error(`RCL ros_message_init error : ${error}`);
                 }
             } else return;
         });
     };
-
-    private setRclType(reqType: string, master: rclnodejs.Node, raw: any): rclType {
-        const rclType: rclType = {
-            rcl: reqType,
-            node: master,
-            messageType: raw.message_type,
-            name: raw.name
-        };
-        return rclType;
-    };
 };
 
-async function run() {
+/**
+ * async function for invoke MasterClientLaunch class instance
+ * @see MasterClientLaunch
+ */
+async function run() : Promise<void> {
     new MasterClientLaunch();
 };
 
+/**
+ * function for welcome logging
+ */
 function welcome() {
     console.log('  _____   ____   _____ ___    __  __  ____ _______ _______    _____ _      _____ ______ _   _ _______ ');
     console.log(' |  __ \\ / __ \\ / ____|__ \\  |  \\/  |/ __ \\__   __|__   __|  / ____| |    |_   _|  ____| \\ | |__   __|');
@@ -110,13 +128,14 @@ function welcome() {
 
 /**
  * async function for main runtime
- * @returns : Promise<void>
+ * @see run
+ * @see welcome
  */
-(async function main(): Promise<void> {
+(async function main() : Promise<void> {
     run()
     .then(() => welcome())
     .catch((err) => log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${err} `));
 })().catch((e): void => {
-    log.error('ROS2-MQTT [MASTER] error : ', e);
+    log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${e}`);
     process.exit(1);
 });
