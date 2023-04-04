@@ -72,7 +72,8 @@ class MasterClientLaunch {
             if(mqttPacket.topic === 'ros_message_init') {
                 try {
                     const json = JSON.parse(mqttMessage);
-
+                    log.info(`RCL ${defaultTopic} json : ${JSON.stringify(json)}`);
+                    
                     for(let raw of json) {
                         if(raw.type === reqType.sub)  {
                             createROSSubscription(master, raw.message_type, raw.name, mqtt);
@@ -97,8 +98,8 @@ class MasterClientLaunch {
                         };
                     };
                 } catch (error) {
-                    log.error(`RCL ros_message_init error : ${error}`);
-                }
+                    log.error(`RCL ros_message_init : ${error}`);
+                };
             } else return;
         });
     };
@@ -137,5 +138,4 @@ function welcome() {
     .catch((err) => log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${err} `));
 })().catch((e): void => {
     log.error(`ROS2-MQTT [MASTER] Client has crashed by.. ${e}`);
-    process.exit(1);
 });

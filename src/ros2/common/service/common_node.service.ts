@@ -37,7 +37,6 @@ const rclType: MQTTRequest = {
     service : 'service'
 };
 
-
 /**
  * function for ROS2 subscription & MQTT publishing
  * @see rclnodejs.Node
@@ -49,9 +48,8 @@ const rclType: MQTTRequest = {
  * @param mqtt : Mqtt
  */
 export function createROSSubscription(node: rclnodejs.Node, messageType: any, topic: string, mqtt: Mqtt) : void {
-    log.info(`RCL [${topic}] subscription created`);
-
     try {
+        log.info(`RCL [${topic}] subscription created`);
         node.createSubscription(messageType, topic, (message) => {
             try {
                 if(message === null || message === '') log.error(`RCL ${topic} subscription has return empty message`);
@@ -92,7 +90,7 @@ export function createROSPublisher(node: rclnodejs.Node, messageType: any, topic
                     rosPublisher.publish(parsedMQTT.data);
                 } else return;
             } catch (error) {
-                log.error(`error : ${error}`);
+                log.error(`RCL createPublisher : ${error}`);
             };            
         });
     } catch (error) {

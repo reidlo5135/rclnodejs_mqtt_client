@@ -55,7 +55,6 @@ export default class Mqtt {
         });
         this.client.on("error", (err) => {
             log.error(`MQTT Error Occurred Caused By ${err}`);
-            process.exit(1);
         });
     };
 
@@ -80,13 +79,17 @@ export default class Mqtt {
      * @see Mqtt
      * @see client
      */
-    public async subscribe(topic:string): Promise<void> {
-        this.client.subscribe(topic, function(err, granted) {
-            if (err) {
-                log.error(`MQTT ${topic} subscribe Error Occurred Caused By ${err}`);
-                return;
-            };
-            log.info(`MQTT subscribe granted by topic [${granted[0].topic}]`);
-        });
+    public subscribe(topic:string) : void {
+        try {
+            this.client.subscribe(topic, function(err, granted) {
+                if (err) {
+                    log.error(`MQTT ${topic} subscribe Error Occurred Caused By ${err}`);
+                    return;
+                };
+                log.info(`MQTT subscribe granted by topic [${granted[0].topic}]`);
+            });
+        } catch (error) {
+            log.error(`MQTT ${topic} subscription ${error}`);
+        }
     };
 };
