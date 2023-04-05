@@ -18,8 +18,6 @@ import * as rclnodejs from 'rclnodejs';
 import Mqtt from "../../mqtt/service/mqtt.service";
 import { log } from "../common/infra/common_logger.infra";
 import { createROSSubscription } from '../common/service/common_node.service';
-import { MQTTRequest } from '../../mqtt/type/mqtt_request.type';
-import { IPublishPacket } from 'mqtt';
 
 /**
  * Class for MQTT publish/subscribe & generate ROS2 publisher/subscriber/action/service
@@ -58,7 +56,19 @@ class SubscriptionOnlyLaunch {
      * @param mqtt : MQTT
      */
     private async runRCLSubscription(master: rclnodejs.Node, mqtt: Mqtt) : Promise<void> {
-        createROSSubscription(master, 'nav_msgs/msg/Odometry', '/odom', mqtt);
+        const target : Array<any> = [
+            {
+                messageType: 'nav_msgs/msg/Odometry',
+                topic: "/odom"
+            },
+            {
+                messageType: 'sensor_msgs/msg/Imu',
+                topic: "/imu/data"
+            }
+        ]
+        for(let raw of target) {
+            createROSSubscription(master, raw.messageType, raw.topic, mqtt);
+        };
     };
 };
 
