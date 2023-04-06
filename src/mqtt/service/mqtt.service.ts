@@ -53,11 +53,11 @@ export default class Mqtt {
     private onConnect() : void {
         this.client.on("connect", () => {
             if(!this.client.connected) {
-                log.error('MQTT disconnected');
+                log.error('[MQTT] connection discarded');
             };
         });
         this.client.on("error", (err) => {
-            log.error(`MQTT Error Occurred Caused By ${err}`);
+            log.error(`[MQTT] Error Occurred Caused By ${err}`);
         });
     };
 
@@ -72,7 +72,7 @@ export default class Mqtt {
         try {
             this.client.publish(topic, message);
         } catch (error) {
-            log.error(`MQTT publisher errror : ${error}`);
+            log.error(`[MQTT] publisher errror : ${error}`);
         };
     };
 
@@ -86,13 +86,13 @@ export default class Mqtt {
         try {
             this.client.subscribe(topic, function(err, granted) {
                 if (err) {
-                    log.error(`MQTT ${topic} subscribe Error Occurred Caused By ${err}`);
+                    log.error(`[MQTT] ${topic} subscription Error Occurred Caused By ${err}`);
                     return;
                 };
-                log.info(`MQTT subscribe granted by topic [${granted[0].topic}]`);
+                log.info(`[MQTT] subscription has granted by topic {${granted[0].topic}}`);
             });
         } catch (error) {
-            log.error(`MQTT ${topic} subscription ${error}`);
+            log.error(`[MQTT] {${topic}} subscription : ${error}`);
         };
     };
 };
