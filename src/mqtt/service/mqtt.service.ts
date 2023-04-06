@@ -52,6 +52,7 @@ export default class Mqtt {
      * private void function for connect MQTT & handle MQTT Connections' Error
      */
     private onConnect() : void {
+        log.info(`[MQTT] connected with {${this.url}}`);
         this.client.on("connect", () => {
             if(!this.client.connected) {
                 log.error('[MQTT] connection discarded');
