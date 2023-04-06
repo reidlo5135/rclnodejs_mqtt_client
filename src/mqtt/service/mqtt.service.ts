@@ -42,7 +42,8 @@ export default class Mqtt {
         const URL_JARATWO : string = 'tcp://192.168.0.119:1883';
         const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
         const URL_REIDLO_HOME : string = 'tcp://192.168.0.132:1883';
-        this.url = URL_REIDLO_LINUX;
+        const URL_DOODLE : string = 'tcp://10.223.188.12:1883';
+        this.url = URL_DOODLE;
         this.client = mqtt.connect(this.url);
         this.onConnect();
     };
@@ -77,7 +78,7 @@ export default class Mqtt {
     };
 
     /**
-     * public void function for MQTT subscription
+     * public void function for MQTT subscriptionc
      * @param topic 
      * @see Mqtt
      * @see client
