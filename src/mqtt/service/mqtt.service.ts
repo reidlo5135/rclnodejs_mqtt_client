@@ -39,7 +39,6 @@ export default class Mqtt {
      * @see onConnect
      */
     constructor(url_target : string) {
-        const URL_JARATWO : string = 'tcp://192.168.0.119:1883';
         this.url = url_target;
         this.client = mqtt.connect(this.url);
         this.onConnect();
@@ -56,7 +55,7 @@ export default class Mqtt {
             };
         });
         this.client.on("error", (err) => {
-            log.error(`[MQTT] Error Occurred Caused By ${err}`);
+            log.error(`[MQTT] connection on ${err}`);
         });
     };
 
@@ -85,7 +84,7 @@ export default class Mqtt {
         try {
             this.client.subscribe(topic, function(err, granted) {
                 if (err) {
-                    log.error(`[MQTT] ${topic} subscription Error Occurred Caused By ${err}`);
+                    log.error(`[MQTT] ${topic} subscription on ${err}`);
                     return;
                 };
                 log.info(`[MQTT] subscription has granted by topic {${granted[0].topic}}`);

@@ -72,7 +72,7 @@ class MasterClientLaunch {
             service : 'call'
         };
 
-        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {    
+        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {
             if(mqttPacket.topic === 'ros_message_init') {
                 log.info(`[RCL] {ros_message_init} init : ${mqttMessage.toString()}`);
                 try {
