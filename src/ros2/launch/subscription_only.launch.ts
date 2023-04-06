@@ -37,7 +37,8 @@ class SubscriptionOnlyLaunch {
         rclnodejs.init()
             .then(() => {
                 const master : rclnodejs.Node = new rclnodejs.Node('subscription_only_launch');
-                const mqtt : Mqtt = new Mqtt();
+                const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
+                const mqtt : Mqtt = new Mqtt(URL_REIDLO_LINUX);
                 this.runRCLSubscription(master, mqtt);
                 master.spin();
             })

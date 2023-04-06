@@ -38,12 +38,9 @@ export default class Mqtt {
      * constructor for initialize url, client & invoke this#onConnect()
      * @see onConnect
      */
-    constructor() {
+    constructor(url_target : string) {
         const URL_JARATWO : string = 'tcp://192.168.0.119:1883';
-        const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
-        const URL_REIDLO_HOME : string = 'tcp://192.168.0.132:1883';
-        const URL_DOODLE : string = 'tcp://10.223.188.12:1883';
-        this.url = URL_DOODLE;
+        this.url = url_target;
         this.client = mqtt.connect(this.url);
         this.onConnect();
     };

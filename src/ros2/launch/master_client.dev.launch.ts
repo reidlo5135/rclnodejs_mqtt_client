@@ -27,7 +27,7 @@ import { createROSPublisher, createROSSubscription, createROSServiceClient, requ
  * @version 1.0.0
  * @since 2023/03/31
 */
-class MasterClientLaunch {
+class MasterClientDevLaunch {
 
     /**
      * constructor for create master rcl node & initialize Mqtt class instance & invoke this runRCL
@@ -39,13 +39,13 @@ class MasterClientLaunch {
         rclnodejs.init()
             .then(() => {
                 const master : rclnodejs.Node = new rclnodejs.Node('master_mqtt_client_launch');
-                const URL_DOODLE : string = 'tcp://10.223.188.12:1883';
-                const mqtt : Mqtt = new Mqtt(URL_DOODLE);
+                const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
+                const mqtt : Mqtt = new Mqtt(URL_REIDLO_LINUX);
                 this.runRCL(master, mqtt);
                 master.spin();
             })
             .catch((err) => {
-                log.error(`[RCL] MasterClientLaunch ${err}`);
+                log.error(`[RCL] MasterClientDevLaunch ${err}`);
             });
     };
 
@@ -106,11 +106,11 @@ class MasterClientLaunch {
 };
 
 /**
- * async function for invoke MasterClientLaunch class instance
- * @see MasterClientLaunch
+ * async function for invoke MasterClientDevLaunch class instance
+ * @see MasterClientDevLaunch
  */
 async function run() : Promise<void> {
-    new MasterClientLaunch();
+    new MasterClientDevLaunch();
 };
 
 /**
