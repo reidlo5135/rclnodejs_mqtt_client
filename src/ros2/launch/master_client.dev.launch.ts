@@ -38,7 +38,7 @@ class MasterClientDevLaunch {
     constructor() {
         rclnodejs.init()
             .then(() => {
-                const master : rclnodejs.Node = new rclnodejs.Node('master_mqtt_client_launch');
+                const master : rclnodejs.Node = new rclnodejs.Node('master_mqtt_client_dev_launch');
                 if(master.spinning) {
                     master.destroy();
                 };
@@ -140,6 +140,6 @@ function welcome() : void {
     run()
     .then(() => welcome())
     .catch((err) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
-})().catch((e): void => {
+})().catch((e) : void => {
     log.error(`[RCL-MASTER] Client has crashed by.. ${e}`);
 });

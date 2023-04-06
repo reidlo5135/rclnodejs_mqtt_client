@@ -39,6 +39,9 @@ class MasterClientLaunch {
         rclnodejs.init()
             .then(() => {
                 const master : rclnodejs.Node = new rclnodejs.Node('master_mqtt_client_launch');
+                if(master.spinning) {
+                    master.destroy();
+                };
                 const URL_DOODLE : string = 'tcp://10.223.188.12:1883';
                 const mqtt : Mqtt = new Mqtt(URL_DOODLE);
                 this.runRCL(master, mqtt);
@@ -83,7 +86,7 @@ class MasterClientLaunch {
                         } else if(raw.type === reqType.action) {
                             createROSActionClient(master, raw.message_type, raw.name)
                                 .then((client) => {
-                                    requestROSActionServer(client!, raw.name, raw.name, mqtt);
+                                    requestROSActionServer(client!, raw.request_type, raw.name, mqtt);
                                 })
                                 .catch((error) => {
                                     log.error(`[RCL] request action client [${error}]`);
@@ -91,7 +94,7 @@ class MasterClientLaunch {
                         } else if(raw.type === reqType.service) {
                             createROSServiceClient(master, raw.message_type, raw.name)
                                 .then((client) => {
-                                    requestROSServiceServer(client!, raw.request_type, mqttTopic, mqtt);
+                                    requestROSServiceServer(client!, raw.request_type, raw.name, mqtt);
                                 })
                                 .catch((error) => {
                                     log.error(`[RCL] service client [${error}]`);
@@ -137,6 +140,6 @@ function welcome() : void {
     run()
     .then(() => welcome())
     .catch((err) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
-})().catch((e): void => {
+})().catch((e) : void => {
     log.error(`[RCL-MASTER] Client has crashed by.. ${e}`);
 });
