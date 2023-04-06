@@ -17,6 +17,9 @@ import { log } from '../../ros2/common/infra/common_logger.infra';
 
 /**
  * Class for MQTT Connections
+ * @author wavem-reidlo
+ * @version 1.0.0
+ * @since 2023.03.27
  * @see Mqtt
  */
 export default class Mqtt {
@@ -24,22 +27,22 @@ export default class Mqtt {
     /**
      * field for MQTT url
      */
-    url;
+    url : string;
 
     /**
      * fiedl for this class instance
      */
-    client;
+    client : mqtt.MqttClient;
 
     /**
      * constructor for initialize url, client & invoke this#onConnect()
      * @see onConnect
      */
     constructor() {
-        const url_jaraTwo = 'tcp://192.168.0.119:1883';
-        const url_wavem = 'tcp://192.168.0.187:1883';
-        const url_reidlo = 'tcp://192.168.0.132:1883';
-        this.url = url_wavem;
+        const URL_JARATWO : string = 'tcp://192.168.0.119:1883';
+        const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
+        const URL_REIDLO_HOME : string = 'tcp://192.168.0.132:1883';
+        this.url = URL_REIDLO_LINUX;
         this.client = mqtt.connect(this.url);
         this.onConnect();
     };
@@ -47,7 +50,7 @@ export default class Mqtt {
     /**
      * private void function for connect MQTT & handle MQTT Connections' Error
      */
-    private onConnect() {
+    private onConnect() : void {
         this.client.on("connect", () => {
             if(!this.client.connected) {
                 log.error('MQTT disconnected');
@@ -65,12 +68,12 @@ export default class Mqtt {
      * @see Mqtt
      * @see client 
      */
-    public publish(topic:string, message:string) {
+    public publish(topic : string, message : string) : void {
         try {
             this.client.publish(topic, message);
         } catch (error) {
             log.error(`MQTT publisher errror : ${error}`);
-        }
+        };
     };
 
     /**
@@ -79,7 +82,7 @@ export default class Mqtt {
      * @see Mqtt
      * @see client
      */
-    public subscribe(topic:string) : void {
+    public subscribe(topic : string) : void {
         try {
             this.client.subscribe(topic, function(err, granted) {
                 if (err) {
@@ -90,6 +93,6 @@ export default class Mqtt {
             });
         } catch (error) {
             log.error(`MQTT ${topic} subscription ${error}`);
-        }
+        };
     };
 };

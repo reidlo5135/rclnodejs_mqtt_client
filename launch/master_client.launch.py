@@ -20,6 +20,9 @@ from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 
 # function for ROS2 launch rclnodejs application
+# @author wavem-reidlo
+# @version 1.0.0
+# @since 2023.03.31
 def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')

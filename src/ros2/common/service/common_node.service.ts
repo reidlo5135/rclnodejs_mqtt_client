@@ -15,8 +15,8 @@
 'strict mode';
 
 import * as rclnodejs from 'rclnodejs';
-import Mqtt from '../../../mqtt/service/mqtt.service';
 import { log } from '../infra/common_logger.infra';
+import Mqtt from '../../../mqtt/service/mqtt.service';
 import { MQTTRequest } from '../../../mqtt/type/mqtt_request.type';
 
 /**
@@ -30,7 +30,7 @@ import { MQTTRequest } from '../../../mqtt/type/mqtt_request.type';
  * type JSON for rcl request type
  * @see MQTTRequest
  */
-const rclType: MQTTRequest = {
+const rclType : MQTTRequest = {
     pub : 'pub',
     sub : 'sub',
     action : 'action',
@@ -47,7 +47,7 @@ const rclType: MQTTRequest = {
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function createROSSubscription(node: rclnodejs.Node, messageType: any, topic: string, mqtt: Mqtt) : void {
+export function createROSSubscription(node : rclnodejs.Node, messageType : any, topic : string, mqtt : Mqtt) : void {
     try {
         log.info(`RCL [${topic}] subscription created`);
         node.createSubscription(messageType, topic, (message) => {
@@ -60,7 +60,7 @@ export function createROSSubscription(node: rclnodejs.Node, messageType: any, to
         }); 
     } catch (error) {
         log.error(`RCL createROSSubscription ${error}`);
-    }
+    };
 };
 
 /**
@@ -73,7 +73,7 @@ export function createROSSubscription(node: rclnodejs.Node, messageType: any, to
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function createROSPublisher(node: rclnodejs.Node, messageType: any, topic: string, mqtt: Mqtt) : void {
+export function createROSPublisher(node : rclnodejs.Node, messageType : any, topic : string, mqtt : Mqtt) : void {
     try {
         const rosPublisher = node.createPublisher(messageType, topic);
         log.info(`RCL [${rosPublisher.topic}] publisher created`);
@@ -107,7 +107,7 @@ export function createROSPublisher(node: rclnodejs.Node, messageType: any, topic
  * @param action : string
  * @returns Promise<rclnodejs.ActionClient<any>>
  */
-export async function createROSActionClient(node: rclnodejs.Node, messageType: any, action: string) : Promise<rclnodejs.ActionClient<any> | undefined> {
+export async function createROSActionClient(node : rclnodejs.Node, messageType : any, action : string) : Promise<rclnodejs.ActionClient<any> | undefined> {
     log.info(`RCL action client message type : ${messageType}, action : ${action}`);
     let actionClient;
     try {
@@ -127,7 +127,7 @@ export async function createROSActionClient(node: rclnodejs.Node, messageType: a
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function requestROSActionServer(rosActionClient: rclnodejs.ActionClient<any>, goal: any, topic: string, mqtt: Mqtt) : void {
+export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<any>, goal : any, topic : string, mqtt : Mqtt) : void {
     log.info(`RCL action client mqttTopic : ${topic}, goal : ${goal}`);
     const parsedMQTTTopic = topic + '/reqeust';
 
@@ -177,7 +177,7 @@ export function requestROSActionServer(rosActionClient: rclnodejs.ActionClient<a
  * @param rosService : string
  * @returns Promise<rclnodejs.Client<any>>
  */
-export async function createROSServiceClient(node: rclnodejs.Node, messageType: any, rosService: string) : Promise<rclnodejs.Client<any> | undefined> {
+export async function createROSServiceClient(node : rclnodejs.Node, messageType : any, rosService : string) : Promise<rclnodejs.Client<any> | undefined> {
     log.info(`RCL client message type : ${messageType}, service : ${rosService}`);
     let serviceClient;
     try {
@@ -198,7 +198,7 @@ export async function createROSServiceClient(node: rclnodejs.Node, messageType: 
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function requestROSServiceServer(rosClient: rclnodejs.Client<any>, requestType: any, topic: string, mqtt: Mqtt) : void {
+export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, requestType : any, topic : string, mqtt : Mqtt) : void {
     const request = rclnodejs.createMessageObject(requestType);
     mqtt.subscribe(topic);
     mqtt.client.on('message', (mqttTopic, mqttMessage) => {

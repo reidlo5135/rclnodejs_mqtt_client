@@ -36,8 +36,8 @@ class SubscriptionOnlyLaunch {
     constructor() {
         rclnodejs.init()
             .then(() => {
-                const master = new rclnodejs.Node('subscription_only_launch');
-                const mqtt:Mqtt = new Mqtt();
+                const master : rclnodejs.Node = new rclnodejs.Node('subscription_only_launch');
+                const mqtt : Mqtt = new Mqtt();
                 this.runRCLSubscription(master, mqtt);
                 master.spin();
             })
@@ -55,7 +55,7 @@ class SubscriptionOnlyLaunch {
      * @param master : rclnodejs.Node
      * @param mqtt : MQTT
      */
-    private async runRCLSubscription(master: rclnodejs.Node, mqtt: Mqtt) : Promise<void> {
+    private async runRCLSubscription(master : rclnodejs.Node, mqtt : Mqtt) : Promise<void> {
         const target : Array<any> = [
             {
                 messageType: 'nav_msgs/msg/Odometry',
@@ -64,6 +64,14 @@ class SubscriptionOnlyLaunch {
             {
                 messageType: 'sensor_msgs/msg/Imu',
                 topic: "/imu/data"
+            },
+            {
+                messageType: 'geometry_msgs/msg/Pose',
+                topic: "/robot_pose"
+            },
+            {
+                messageType: 'tf2_msgs/msg/TFMessage',
+                topic: '/tf'
             }
         ]
         for(let raw of target) {
@@ -83,7 +91,7 @@ async function run() : Promise<void> {
 /**
  * function for welcome logging
  */
-function welcome() {
+function welcome() : void {
     console.log('  _____   ____   _____ ___    __  __  ____ _______ _______    _____ _      _____ ______ _   _ _______ ');
     console.log(' |  __ \\ / __ \\ / ____|__ \\  |  \\/  |/ __ \\__   __|__   __|  / ____| |    |_   _|  ____| \\ | |__   __|');
     console.log(' | |__) | |  | | (___    ) | | \\  / | |  | | | |     | |    | |    | |      | | | |__  |  \\| |  | |   ');

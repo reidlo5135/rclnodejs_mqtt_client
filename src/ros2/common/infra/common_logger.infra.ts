@@ -19,6 +19,12 @@ import winston from 'winston';
 import winstonDaily from 'winston-daily-rotate-file';
 
 /**
+ * @author wavem-reidlo
+ * @version 1.0.0
+ * @since 2023.03.27
+ */
+
+/**
  * const instance for select winston's functions
  */
 const { combine, timestamp, label, printf } = winston.format;
@@ -26,12 +32,12 @@ const { combine, timestamp, label, printf } = winston.format;
 /**
  * const instance for define log files' directory
  */
-const logDir = `${process.cwd()}/logs`;
+const logDir : string = `${process.cwd()}/logs`;
 
 /**
  * const instance for define logging message format
  */
-const logFormat = printf(({ level, message, label, timestamp }) => {
+const logFormat : winston.Logform.Format = printf(({ level, message, label, timestamp }) => {
    return `${timestamp} [${label}] ${level}: ${message}`;
 });
 
@@ -39,10 +45,9 @@ const logFormat = printf(({ level, message, label, timestamp }) => {
  * const instance for create winston logger
  * @see winston
  */
-export const log = winston.createLogger({
+export const log : winston.Logger = winston.createLogger({
     format: combine(
        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-       label({ label: 'ros2_mqtt_client' }),
        logFormat,
     ),
     transports: [
@@ -63,12 +68,12 @@ export const log = winston.createLogger({
            zippedArchive: true,
         }),
         new winstonDaily({
-         level: 'debug',
-         datePattern: 'YYYY-MM-DD',
-         dirname: logDir + '/debug',
-         filename: `%DATE%.debug.log`,
-         maxFiles: 30,
-         zippedArchive: true,
+            level: 'debug',
+            datePattern: 'YYYY-MM-DD',
+            dirname: logDir + '/debug',
+            filename: `%DATE%.debug.log`,
+            maxFiles: 30,
+            zippedArchive: true,
       }),
      ],
      exceptionHandlers: [
