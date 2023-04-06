@@ -88,7 +88,7 @@ export function createROSPublisher(node : rclnodejs.Node, messageType : any, top
                 const isTopicEqual = (topic === mqttTopic);
 
                 if(isPub && isTopicEqual) {
-                    log.info(`RCL {${topic}} parsedMQTT data : ${JSON.stringify(parsedMQTT.data)}`);
+                    log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsedMQTT.data)}`);
                     rosPublisher.publish(parsedMQTT.data);
                 } else return;
             } catch (error) {
