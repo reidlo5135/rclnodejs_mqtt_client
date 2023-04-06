@@ -65,12 +65,13 @@ class MasterClientLaunch {
         const reqType : MQTTRequest = {
             pub : 'pub',
             sub : 'sub',
-            action : 'action',
-            service : 'service'
+            action : 'goal',
+            service : 'call'
         };
 
-        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {           
+        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {    
             if(mqttPacket.topic === 'ros_message_init') {
+                log.info(`[RCL] {ros_message_init} init : ${mqttMessage.toString()}`);
                 try {
                     const json = JSON.parse(mqttMessage);
                     
@@ -85,7 +86,7 @@ class MasterClientLaunch {
                                     requestROSActionServer(client!, raw.name, raw.name, mqtt);
                                 })
                                 .catch((error) => {
-                                    log.error(`[RCL] request action server ${error}`);
+                                    log.error(`[RCL] request action client [${error}]`);
                                 });
                         } else if(raw.type === reqType.service) {
                             createROSServiceClient(master, raw.message_type, raw.name)
@@ -93,12 +94,12 @@ class MasterClientLaunch {
                                     requestROSServiceServer(client!, raw.request_type, mqttTopic, mqtt);
                                 })
                                 .catch((error) => {
-                                    log.error(`[RCL] service client ${error}`);
+                                    log.error(`[RCL] service client [${error}]`);
                                 });
                         };
                     };
                 } catch (error) {
-                    log.error(`[RCL] ros_message_init : ${error}`);
+                    log.error(`[RCL] ros_message_init : [${error}]`);
                 };
             } else return;
         });
