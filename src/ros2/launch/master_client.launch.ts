@@ -101,7 +101,7 @@ class MasterClientLaunch {
                                     requestROSActionServer(client!, raw.request_type, raw.name, mqtt);
                                 })
                                 .catch((error) => {
-                                    log.error(`[RCL] request action client [${error}]`);
+                                    log.error(`[RCL] action client [${error}]`);
                                 });
                         } else if(raw.type === reqType.service) {
                             createROSServiceClient(master, raw.message_type, raw.name)

@@ -61,8 +61,7 @@ export async function createROSSubscription(node : rclnodejs.Node, messageType :
                     mqtt.publish(topic, JSON.stringify(message));
                 };
             } catch (error : any) {
-                log.error(`RCL {${topic}} error : ${error}`);
-                throw new Error(error);
+                log.error(`[RCL] creating {${topic}} subscription : ${error}`);
             };
         }); 
     } catch (error : any) {
@@ -91,20 +90,19 @@ export async function createROSPublisher(node : rclnodejs.Node, messageType : an
                 const isTopicEqual : boolean = (topic === mqttTopic);
                                                 
                 if(isTopicEqual) {
-                    log.info(`[RCL] publihser topic ${topic}, mqttTopic : ${mqttTopic}`);
                     const parsedMQTT : any = parseMQTT(mqttMessage.toString());
                     const isPublisher : boolean = (parsedMQTT.mode === rclType.pub);
 
                     if(isPublisher) {
+                        log.info(`[RCL] publihser topic ${topic}, mqttTopic : ${mqttTopic}`);
                         log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsedMQTT.data)}`);
                         rosPublisher.publish(parsedMQTT.data);
                     } else {
-                        log.error(`[RCL] {${mqttTopic}} is not a publihser type...`);
                         return;
                     };
                 } else return;
             } catch (error : any) {
-                log.error(`RCL create publisher : ${error}`);
+                log.error(`RCL creating {${topic}} publisher : ${error}`);
             };            
         });
     } catch (error : any) {
@@ -128,7 +126,7 @@ export async function createROSActionClient(node : rclnodejs.Node, messageType :
         actionClient = new rclnodejs.ActionClient(node, messageType, action);
         log.info(`[RCL] action client for {${action}} created`);
     } catch (error : any) {
-        log.error(`RCL createROSActionClient ${error}`);
+        log.error(`[RCL] createROSActionClient ${error}`);
     };
     return actionClient;
 };
@@ -164,7 +162,7 @@ export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<
                                 return;
                             };
                             try {
-                                rosActionClient.sendGoal(goal, (feedback) => {
+                                rosActionClient.sendGoal(goal, (feedback : any) => {
                                     try {
                                         const feedbackMessage : string = JSON.stringify(feedback);
                                         // log.info(`[RCL] action server goalHandle feedback : {${feedbackMessage}}`);
@@ -259,12 +257,12 @@ export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, reque
                                 log.error(`[RCL] service {${rosService}} is not available... check your ROS2 Launch Mode`);
                                 return;
                             };
-                            rosClient.sendRequest(request, (response) => {
+                            rosClient.sendRequest(request, (response : any) => {
                                 try {
                                     if(response === null) log.error(`[RCL] call {${rosService}} service call has empty response...`);
                                     else {
-                                        const result = JSON.stringify(response);
-                                        mqtt.publish(`${rosService}`, result);
+                                        const result : string = JSON.stringify(response);
+                                        mqtt.publish(`${rosService}/response`, result);
                                     };
                                 } catch (error : any) {
                                     log.error(`[RCL] call {${rosService}} : [${error}]`);
