@@ -4,8 +4,9 @@
   <name>ros2_mqtt_client</name>
   <version>1.0.0</version>
   <description>ROS2 MQTT Client</description>
-  <maintainer email="201840103@daelim.ac.kr">wavem-reidlo</maintainer>
-  <license>Apache 2.0</license>
+  <maintainer email="naru5135@wavem.net">wavem-reidlo</maintainer>
+  <author email="naru5135@wavem.net">wavem-reidlo</author>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
