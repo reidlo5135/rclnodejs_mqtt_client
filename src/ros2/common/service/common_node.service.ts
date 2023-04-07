@@ -119,7 +119,7 @@ export async function createROSPublisher(node : rclnodejs.Node, messageType : an
  * @param node : rclnodejs.Node
  * @param messageType : any
  * @param action : string
- * @returns Promise<rclnodejs.ActionClient<any>>
+ * @returns Promise<rclnodejs.ActionClient<any>
  */
 export async function createROSActionClient(node : rclnodejs.Node, messageType : any, action : string) : Promise<rclnodejs.ActionClient<any> | undefined> {
     log.info(`[RCL] creating action client for {${action}} with type [${messageType}]...`);
@@ -135,9 +135,9 @@ export async function createROSActionClient(node : rclnodejs.Node, messageType :
 
 /**
  * function for ROS2 request action server with action client
- * @see rclnodejs.ActionClient<amy>
+ * @see rclnodejs.ActionClient<any>
  * @see Mqtt
- * @param rosActionClient : rclnodejs.ActionClient<amy>
+ * @param rosActionClient : rclnodejs.ActionClient<any>
  * @param goal : any
  * @param topic : string
  * @param mqtt : Mqtt
@@ -212,7 +212,7 @@ export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<
  * @param node : rclnodejs.Node
  * @param messageType : any
  * @param rosService : string
- * @returns Promise<rclnodejs.Client<any>>
+ * @returns Promise<rclnodejs.Client<any>
  */
 export async function createROSServiceClient(node : rclnodejs.Node, messageType : any, rosService : string) : Promise<rclnodejs.Client<any> | undefined> {
     log.info(`[RCL] creating service client for {${rosService}} ...`);
@@ -286,6 +286,12 @@ export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, reque
     };
 };
 
+/**
+ * function for parse MQTT message into JSON
+ * @see JSON
+ * @param mqttMessage : string
+ * @returns parsedMQTT : any
+ */
 function parseMQTT(mqttMessage : string) : any {
     let parsedMQTT : any = {};
     try {

@@ -76,7 +76,7 @@ export default class Mqtt {
     };
 
     /**
-     * public void function for MQTT subscriptionc
+     * public void function for MQTT subscriptions
      * @param topic 
      * @see Mqtt
      * @see client
