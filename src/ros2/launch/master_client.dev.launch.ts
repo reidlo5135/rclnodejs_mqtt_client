@@ -47,8 +47,9 @@ class MasterClientDevLaunch {
                 this.runRCL(master, mqtt);
                 master.spin();
             })
-            .catch((err) => {
+            .catch((err : any) => {
                 log.error(`[RCL] MasterClientLaunch ${err}`);
+                throw new Error(err);
             });
     };
 
@@ -74,15 +75,26 @@ class MasterClientDevLaunch {
 
         mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {    
             if(mqttPacket.topic === 'ros_message_init') {
-                // log.info(`[RCL] {ros_message_init} init : ${mqttMessage.toString()}`);
                 try {
                     const json = JSON.parse(mqttMessage);
                     
                     for(let raw of json) {
                         if(raw.type === reqType.sub)  {
-                            createROSSubscription(master, raw.message_type, raw.name, mqtt);
+                            createROSSubscription(master, raw.message_type, raw.name, mqtt)
+                                .then(() => {
+                                    log.info(`[RCL] {${raw.name}} subscription created`);
+                                })
+                                .catch((error : Error) => {
+                                    log.error(`[RCL] {${raw.name}} subscription throws : ${error}`);
+                                });
                         } else if(raw.type === reqType.pub) {
-                            createROSPublisher(master, raw.message_type, raw.name, mqtt);
+                            createROSPublisher(master, raw.message_type, raw.name, mqtt)
+                                .then(() => {
+                                    log.info(`[RCL] {${raw.name}} publisher created`);
+                                })
+                                .catch((error : Error) => {
+                                    log.error(`[RCL] {${raw.name}} publisher throws : ${error}`);
+                                });
                         } else if(raw.type === reqType.action) {
                             createROSActionClient(master, raw.message_type, raw.name)
                                 .then((client) => {
@@ -101,8 +113,9 @@ class MasterClientDevLaunch {
                                 });
                         };
                     };
-                } catch (error) {
+                } catch (error : any) {
                     log.error(`[RCL] ros_message_init : [${error}]`);
+                    throw new Error(error);
                 };
             } else return;
         });
@@ -137,9 +150,9 @@ function welcome() : void {
  * @see welcome
  */
 (async function main() : Promise<void> {
-    run()
+    await run()
     .then(() => welcome())
-    .catch((err) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
-})().catch((e) : void => {
+    .catch((err : Error) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
+})().catch((e : Error) : void => {
     log.error(`[RCL-MASTER] Client has crashed by.. ${e}`);
 });

@@ -69,8 +69,9 @@ export default class Mqtt {
     public publish(topic : string, message : string) : void {
         try {
             this.client.publish(topic, message);
-        } catch (error) {
-            log.error(`[MQTT] publisher errror : ${error}`);
+        } catch (error : any) {
+            log.error(`[MQTT] publishing errror : ${error}`);
+            throw new Error(error);
         };
     };
 
@@ -89,8 +90,9 @@ export default class Mqtt {
                 };
                 log.info(`[MQTT] subscription has granted by topic {${granted[0].topic}}`);
             });
-        } catch (error) {
+        } catch (error : any) {
             log.error(`[MQTT] {${topic}} subscription : ${error}`);
+            throw new Error(error);
         };
     };
 };

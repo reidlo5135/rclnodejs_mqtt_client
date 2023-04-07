@@ -80,9 +80,21 @@ class MasterClientLaunch {
                     
                     for(let raw of json) {
                         if(raw.type === reqType.sub)  {
-                            createROSSubscription(master, raw.message_type, raw.name, mqtt);
+                            createROSSubscription(master, raw.message_type, raw.name, mqtt)
+                                .then(() => {
+                                    log.info(`[RCL] {${raw.name}} subscription created`);
+                                })
+                                .catch((error : Error) => {
+                                    log.error(`[RCL] {${raw.name}} subscription throws : ${error}`);
+                                });
                         } else if(raw.type === reqType.pub) {
-                            createROSPublisher(master, raw.message_type, raw.name, mqtt);
+                            createROSPublisher(master, raw.message_type, raw.name, mqtt)
+                                .then(() => {
+                                    log.info(`[RCL] {${raw.name}} publisher created`);
+                                })
+                                .catch((error : Error) => {
+                                    log.error(`[RCL] {${raw.name}} publisher throws : ${error}`);
+                                });
                         } else if(raw.type === reqType.action) {
                             createROSActionClient(master, raw.message_type, raw.name)
                                 .then((client) => {
@@ -137,9 +149,9 @@ function welcome() : void {
  * @see welcome
  */
 (async function main() : Promise<void> {
-    run()
+    await run()
     .then(() => welcome())
-    .catch((err) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
-})().catch((e) : void => {
+    .catch((err : Error) => log.error(`[RCL-MASTER] Client has crashed by.. ${err} `));
+})().catch((e : Error) : void => {
     log.error(`[RCL-MASTER] Client has crashed by.. ${e}`);
 });
