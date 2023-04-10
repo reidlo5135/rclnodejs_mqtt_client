@@ -43,7 +43,8 @@ class MasterClientDevLaunch {
                     master.destroy();
                 };
                 const URL_REIDLO_LINUX : string = 'tcp://192.168.0.187:1883';
-                const mqtt : Mqtt = new Mqtt(URL_REIDLO_LINUX);
+                const URL_JARATWO : string = "tcp://192.168.0.119:1883";
+                const mqtt : Mqtt = new Mqtt(URL_JARATWO);
                 this.runRCL(master, mqtt);
                 master.spin();
             })
