@@ -142,7 +142,7 @@ export async function createROSActionClient(node : rclnodejs.Node, messageType :
  */
 export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<any>, goal : any, topic : string, mqtt : Mqtt) : void {
     log.info(`[RCL] action client {${topic}}, goal : {${goal}}`);
-    const parsedMQTTTopic = topic + '/request';
+    const parsedMQTTTopic : string = topic + '/request';
 
     mqtt.subscribe(parsedMQTTTopic);
     try {
@@ -237,7 +237,7 @@ export async function createROSServiceClient(node : rclnodejs.Node, messageType 
 export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, requestType : any, topic : string, mqtt : Mqtt) : void {
     log.info(`[RCL] service client {${topic}}, requestType : {${requestType}}`);
     const request : any = rclnodejs.createMessageObject(requestType);
-    const parsedMQTTTopic = topic + '/request';
+    const parsedMQTTTopic : string = topic + '/request';
 
     mqtt.subscribe(parsedMQTTTopic);
     try {
