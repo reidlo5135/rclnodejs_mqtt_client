@@ -61,7 +61,7 @@ class MasterClientLaunch {
      * @param master : rclnodejs.Node
      * @param mqtt : MQTT
      */
-    private async runRCL(master : rclnodejs.Node, mqtt : Mqtt) : Promise<void> {
+    private runRCL(master : rclnodejs.Node, mqtt : Mqtt) : void {
         const defaultTopic : string = 'ros_message_init';
         mqtt.subscribe(defaultTopic);
 
@@ -72,7 +72,7 @@ class MasterClientLaunch {
             service : 'call'
         };
 
-        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) => {
+        mqtt.client.on('message', (mqttTopic : string, mqttMessage : string, mqttPacket : IPublishPacket) : void => {
             if(mqttPacket.topic === 'ros_message_init') {
                 log.info(`[RCL] {ros_message_init} init : ${mqttMessage.toString()}`);
                 try {
