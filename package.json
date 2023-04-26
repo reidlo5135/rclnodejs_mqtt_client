@@ -6,9 +6,7 @@
   "author": "wavem-reidlo <naru5135@wavem.net>",
   "license": "Apache-2.0",
   "scripts": {
-    "master_client_launch": "nodemon src/ros2/launch/master_client.launch.ts",
-    "master_client_dev_launch": "nodemon src/ros2/launch/master_client.dev.launch.ts",
-    "subscription_only_launch": "nodemon src/ros2/launch/subscription_only.launch.ts",
+    "jara2_dev_launch": "nodemon src/ros2/launch/jara2.dev.launch.ts",
     "build": "tsc"
   },
   "bin": {

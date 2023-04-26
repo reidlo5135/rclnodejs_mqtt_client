@@ -95,4 +95,16 @@ export default class Mqtt {
             throw new Error(error);
         };
     };
+
+    public unsubscribe(topic : string) : void {
+        try {
+            if(this.client.connected) {
+                this.client.unsubscribe(topic);
+                this.client.reconnect();
+            };
+        } catch (error : any) {
+            log.error(`[MQTT] {${topic}} subscription : ${error}`);
+            throw new Error(error);
+        }
+    };
 };

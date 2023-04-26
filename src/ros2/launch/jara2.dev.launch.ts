@@ -38,7 +38,7 @@ class MasterClientDevLaunch {
     constructor() {
         rclnodejs.init()
             .then(() => {
-                const master : rclnodejs.Node = new rclnodejs.Node('master_mqtt_client_dev_launch');
+                const master : rclnodejs.Node = new rclnodejs.Node('jara2_mqtt_dev_bridge');
                 if(master.spinning) {
                     master.destroy();
                 };
@@ -65,6 +65,7 @@ class MasterClientDevLaunch {
      */
     private runRCL(master : rclnodejs.Node, mqtt : Mqtt) : void {
         const defaultTopic : string = 'ros_message_init';
+        mqtt.unsubscribe(defaultTopic);
         mqtt.subscribe(defaultTopic);
 
         const reqType : MQTTRequest = {
@@ -78,6 +79,7 @@ class MasterClientDevLaunch {
             if(mqttPacket.topic === 'ros_message_init') {
                 try {
                     const json = JSON.parse(mqttMessage);
+                    log.info(`[RCL] init json : ${JSON.stringify(json)}`);
                     
                     for(let raw of json) {
                         if(raw.type === reqType.sub)  {

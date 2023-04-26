@@ -80,10 +80,10 @@ export async function createROSSubscription(node : rclnodejs.Node, messageType :
  * @param mqtt : Mqtt
  */
 export async function createROSPublisher(node : rclnodejs.Node, messageType : any, topic : string, mqtt : Mqtt) : Promise<void> {
-    log.info(`[RCL] creating {${topic}} publisher...`);
+    // log.info(`[RCL] creating {${topic}} publisher...`);
     try {
         const rosPublisher = node.createPublisher(messageType, topic);
-
+        
         mqtt.subscribe(topic);
         mqtt.client.on('message', (mqttTopic : string, mqttMessage : any) => {
             try {
