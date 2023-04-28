@@ -24,7 +24,7 @@
 /**
  * type JSON for define rcl connection type by MQTT request type
  */
-export type MQTTRequest = {
+export type mqtt_request = {
     pub: string
     sub: string
     action: string

@@ -96,15 +96,16 @@ export default class Mqtt {
         };
     };
 
-    public unsubscribe(topic : string) : void {
+    public unsubscribe_after_connection_check(topic : string) : void {
         try {
-            if(this.client.connected) {
+            const is_mqtt_connected : boolean = this.client.connected;
+            if(is_mqtt_connected) {
                 this.client.unsubscribe(topic);
-                this.client.reconnect();
-            };
+                log.info(`[MQTT] unsubcribed on [${topic}]`);
+            } else return;
         } catch (error : any) {
-            log.error(`[MQTT] {${topic}} subscription : ${error}`);
+            log.error(`[MQTT] {${topic}} unsubscription : ${error}`);
             throw new Error(error);
-        }
+        };
     };
 };

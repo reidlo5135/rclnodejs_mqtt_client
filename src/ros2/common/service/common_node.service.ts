@@ -17,7 +17,7 @@
 import * as rclnodejs from 'rclnodejs';
 import { log } from '../infra/common_logger.infra';
 import Mqtt from '../../../mqtt/service/mqtt.service';
-import { MQTTRequest } from '../../../mqtt/type/mqtt_request.type';
+import { mqtt_request } from '../../../mqtt/type/mqtt_request.type';
 
 /**
  * .service.ts for rclnodejs connection establishment
@@ -28,9 +28,9 @@ import { MQTTRequest } from '../../../mqtt/type/mqtt_request.type';
 
 /**
  * type JSON for rcl request type
- * @see MQTTRequest
+ * @see mqtt_request
  */
-const rclType : MQTTRequest = {
+const mqtt_rcl_request_type : mqtt_request = {
     pub : 'pub',
     sub : 'sub',
     action : 'goal',
@@ -43,17 +43,17 @@ const rclType : MQTTRequest = {
  * @see rclnodejs.Subscription
  * @see Mqtt
  * @param node : rclnodejs.Node
- * @param messageType : any
+ * @param message_type : any
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export async function createROSSubscription(node : rclnodejs.Node, messageType : any, topic : string, mqtt : Mqtt) : Promise<void> {
+export async function create_rcl_subscription(node : rclnodejs.Node, message_type : any, topic : string, mqtt : Mqtt) : Promise<void> {
     log.info(`[RCL] creating {${topic}} subscription...`);
     try {
-        node.createSubscription(messageType, topic, (message) => {
-            const isEmpty : boolean = (message === null || message === '' || message === undefined);
+        node.createSubscription(message_type, topic, (message) => {
+            const is_rcl_message_empty : boolean = (message === null || message === '' || message === undefined);
             try {
-                if(isEmpty) {
+                if(is_rcl_message_empty) {
                     const error : string = `[RCL] {${topic}} subscription has return empty message...`;
                     log.error(error);
                     throw new Error(error);
@@ -65,7 +65,7 @@ export async function createROSSubscription(node : rclnodejs.Node, messageType :
             };
         }); 
     } catch (error : any) {
-        log.error(`[RCL] createROSSubscription ${error}`);
+        log.error(`[RCL] create_rcl_subscription ${error}`);
     };
 };
 
@@ -75,28 +75,27 @@ export async function createROSSubscription(node : rclnodejs.Node, messageType :
  * @see rclnodejs.Publisher<any>
  * @see Mqtt
  * @param node : rclnodejs.Node
- * @param messageType : any
+ * @param message_type : any
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export async function createROSPublisher(node : rclnodejs.Node, messageType : any, topic : string, mqtt : Mqtt) : Promise<void> {
-    // log.info(`[RCL] creating {${topic}} publisher...`);
+export async function create_rcl_publisher(node : rclnodejs.Node, message_type : any, topic : string, mqtt : Mqtt) : Promise<void> {
+    log.info(`[RCL] creating {${topic}} publisher...`);
     try {
-        const rosPublisher = node.createPublisher(messageType, topic);
-        
+        const rcl_publisher = node.createPublisher(message_type, topic);
         mqtt.subscribe(topic);
         mqtt.client.on('message', (mqttTopic : string, mqttMessage : any) => {
             try {
-                const isTopicEqual : boolean = (topic === mqttTopic);
+                const is_topic_equals : boolean = (topic === mqttTopic);
                                                 
-                if(isTopicEqual) {
-                    const parsedMQTT : any = parseMQTT(mqttMessage.toString());
-                    const isPublisher : boolean = (parsedMQTT.mode === rclType.pub);
+                if(is_topic_equals) {
+                    const parsed_mqtt : any = parse_mqtt_message_to_json(mqttMessage.toString());
+                    const is_message_publisher_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.pub);
 
-                    if(isPublisher) {
+                    if(is_message_publisher_type) {
                         log.info(`[RCL] publihser topic ${topic}, mqttTopic : ${mqttTopic}`);
-                        log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsedMQTT.data)}`);
-                        rosPublisher.publish(parsedMQTT.data);
+                        log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
+                        rcl_publisher.publish(parsed_mqtt.data);
                     } else {
                         return;
                     };
@@ -106,7 +105,7 @@ export async function createROSPublisher(node : rclnodejs.Node, messageType : an
             };            
         });
     } catch (error : any) {
-        log.error(`RCL createROSPublisher ${error}`);
+        log.error(`[RCL] create_rcl_publisher ${error}`);
     };
 };
 
@@ -115,67 +114,66 @@ export async function createROSPublisher(node : rclnodejs.Node, messageType : an
  * @see rclnodejs.Node
  * @see rclnodejs.ActionClient<any>
  * @param node : rclnodejs.Node
- * @param messageType : any
+ * @param message_type : any
  * @param action : string
  * @returns Promise<rclnodejs.ActionClient<any>
  */
-export async function createROSActionClient(node : rclnodejs.Node, messageType : any, action : string) : Promise<rclnodejs.ActionClient<any> | undefined> {
-    log.info(`[RCL] creating action client for {${action}} with type [${messageType}]...`);
-    let actionClient;
+export async function create_rcl_action_client(node : rclnodejs.Node, message_type : any, action : string) : Promise<rclnodejs.ActionClient<any> | undefined> {
+    log.info(`[RCL] creating action client for {${action}} with type [${message_type}]...`);
+    let rcl_action_client;
     try {
-        actionClient = new rclnodejs.ActionClient(node, messageType, action);
+        rcl_action_client = new rclnodejs.ActionClient(node, message_type, action);
         log.info(`[RCL] action client for {${action}} created`);
     } catch (error : any) {
-        log.error(`[RCL] createROSActionClient ${error}`);
+        log.error(`[RCL] create_rcl_action_client ${error}`);
     };
-    return actionClient;
+    return rcl_action_client;
 };
 
 /**
  * function for ROS2 request action server with action client
  * @see rclnodejs.ActionClient<any>
  * @see Mqtt
- * @param rosActionClient : rclnodejs.ActionClient<any>
+ * @param rcl_action_client : rclnodejs.ActionClient<any>
  * @param goal : any
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<any>, goal : any, topic : string, mqtt : Mqtt) : void {
+export function request_to_rcl_action_server(rcl_action_client : rclnodejs.ActionClient<any>, goal : any, topic : string, mqtt : Mqtt) : void {
     log.info(`[RCL] action client {${topic}}, goal : {${goal}}`);
-    const parsedMQTTTopic : string = topic + '/request';
-
-    mqtt.subscribe(parsedMQTTTopic);
+    const parsed_mqtt_topic : string = topic + '/request';
+    mqtt.subscribe(parsed_mqtt_topic);
     try {
-        mqtt.client.on('message', (mqttTopic : string, mqttMessage : any) => {
-            const isTopicEqual : boolean = (parsedMQTTTopic === mqttTopic);
+        mqtt.client.on('message', (mqtt_topic : string, mqtt_message : any) => {
+            const is_topic_equals : boolean = (parsed_mqtt_topic === mqtt_topic);
                         
-            if(isTopicEqual) {
-                log.info(`[RCL] action client topic ${parsedMQTTTopic}, mqttTopic : ${mqttTopic}`);
-                const parsedMQTT : any = parseMQTT(mqttMessage.toString());
-                const isAction : boolean = (parsedMQTT.mode === rclType.action);
+            if(is_topic_equals) {
+                log.info(`[RCL] action client topic ${parsed_mqtt_topic}, mqttTopic : ${mqtt_topic}`);
+                const parsed_mqtt : any = parse_mqtt_message_to_json(mqtt_message.toString());
+                const is_message_action_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.action);
 
-                if(isAction) {
-                    rosActionClient.waitForServer(1000)
+                if(is_message_action_type) {
+                    rcl_action_client.waitForServer(1000)
                         .then((result : boolean) => {
-                            if(!result || !rosActionClient.isActionServerAvailable()) {
+                            if(!result || !rcl_action_client.isActionServerAvailable()) {
                                 log.error(`[RCL] action {${topic}} is not available... check your ROS2 Launch Mode`);
                                 return;
                             };
                             try {
-                                rosActionClient.sendGoal(goal, (feedback : any) => {
+                                rcl_action_client.sendGoal(goal, (feedback : any) => {
                                     try {
-                                        const feedbackMessage : string = JSON.stringify(feedback);
+                                        const feedback_message : string = JSON.stringify(feedback);
                                         // log.info(`[RCL] action server goalHandle feedback : {${feedbackMessage}}`);
-                                        mqtt.publish(`${topic}/feedback`, feedbackMessage);
+                                        mqtt.publish(`${topic}/feedback`, feedback_message);
                                     } catch (error : any) {
                                         log.error(`[RCL] action server feedback ${error}`);
                                     };
                                 }).then((response : rclnodejs.ClientGoalHandle<any>) => {
                                     try {
-                                        const responseMessage : string = JSON.stringify(response.getResult());
-                                        log.info(`[RCL] action server goalHandle response : {${responseMessage}}`);
+                                        const response_message : string = JSON.stringify(response.getResult());
+                                        log.info(`[RCL] action server goalHandle response : {${response_message}}`);
                                         if(response.status === rclnodejs.GoalResponse.ACCEPT) {
-                                            mqtt.publish(`${topic}/response`, responseMessage);
+                                            mqtt.publish(`${topic}/response`, response_message);
                                         };
                                     } catch (error : any) {
                                         log.error(`[RCL] action server response ${error}`);
@@ -192,7 +190,7 @@ export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<
                             throw new Error(error);
                         });
                 } else {
-                    log.error(`[RCL] {${mqttTopic}} is not a action type...`);
+                    log.error(`[RCL] {${mqtt_topic}} is not a action type...`);
                     return;
                 };               
             } else return;
@@ -208,20 +206,20 @@ export function requestROSActionServer(rosActionClient : rclnodejs.ActionClient<
  * @see rclnodejs.Client<any>
  * @see rclnodejs.Service
  * @param node : rclnodejs.Node
- * @param messageType : any
- * @param rosService : string
+ * @param message_type : any
+ * @param rcl_service_name : string
  * @returns Promise<rclnodejs.Client<any>
  */
-export async function createROSServiceClient(node : rclnodejs.Node, messageType : any, rosService : string) : Promise<rclnodejs.Client<any> | undefined> {
-    log.info(`[RCL] creating service client for {${rosService}} ...`);
-    let serviceClient;
+export async function create_rcl_service_client(node : rclnodejs.Node, message_type : any, rcl_service_name : string) : Promise<rclnodejs.Client<any> | undefined> {
+    log.info(`[RCL] creating service client for {${rcl_service_name}} ...`);
+    let rcl_service_client;
     try {
-        serviceClient = node.createClient(messageType, rosService);
+        rcl_service_client = node.createClient(message_type, rcl_service_name);
     } catch (error : any) {
         log.error(`[RCL] create service client : ${error}`);
     };
-    log.info(`[RCL] service client for {${rosService}} created`);
-    return serviceClient;
+    log.info(`[RCL] service client for {${rcl_service_name}} created`);
+    return rcl_service_client;
 };
 
 /**
@@ -230,42 +228,54 @@ export async function createROSServiceClient(node : rclnodejs.Node, messageType 
  * @see rclnodejs.Client<any>
  * @see rclnodejs.Service
  * @param node : rclnodejs.Node
- * @param requestType : any
+ * @param request_type : any
  * @param topic : string
  * @param mqtt : Mqtt
  */
-export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, requestType : any, topic : string, mqtt : Mqtt) : void {
-    log.info(`[RCL] service client {${topic}}, requestType : {${requestType}}`);
-    const request : any = rclnodejs.createMessageObject(requestType);
-    const parsedMQTTTopic : string = topic + '/request';
-
-    mqtt.subscribe(parsedMQTTTopic);
+export function request_to_rcl_service_server(rcl_client : rclnodejs.Client<any>, request_type : any, topic : string, mqtt : Mqtt) : void {
+    log.info(`[RCL] service client {${topic}}, requestType : {${request_type}}`);
+    const request : any = rclnodejs.createMessageObject(request_type);
+    const parsed_mqtt_topic : string = topic + '/request';
+    mqtt.subscribe(parsed_mqtt_topic);
     try {
-        mqtt.client.on('message', (mqttTopic : string, mqttMessage : any) => {
-            const isTopicEqual : boolean = (parsedMQTTTopic === mqttTopic);
+        mqtt.client.on('message', (mqtt_topic : string, mqtt_message : any) => {
+            const is_topic_equals : boolean = (parsed_mqtt_topic === mqtt_topic);
             
-            if(isTopicEqual) {
-                log.info(`[RCL] service client topic ${parsedMQTTTopic}, mqttTopic : ${mqttTopic}, mqttMessage : ${mqttMessage.toString()}`);
-                const parsedMQTT : any = parseMQTT(mqttMessage.toString());
-                const isService : boolean = (parsedMQTT.mode === rclType.service);
+            if(is_topic_equals) {
+                log.info(`[RCL] service client topic ${parsed_mqtt_topic}, mqttTopic : ${mqtt_topic}, mqttMessage : ${mqtt_message.toString()}`);
+                const parsed_mqtt : any = parse_mqtt_message_to_json(mqtt_message.toString());
+                const is_message_service_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.service);
 
-                if(isService) {
-                    const rosService : string = rosClient.serviceName;
-                    rosClient.waitForService(1000)
+                if(is_message_service_type) {
+                    const rcl_service_name : string = rcl_client.serviceName;
+                    rcl_client.waitForService(1000)
                         .then((result : boolean) => {
-                            if(!result || !rosClient.isServiceServerAvailable()) {
-                                log.error(`[RCL] service {${rosService}} is not available... check your ROS2 Launch Mode`);
+                            if(!result || !rcl_client.isServiceServerAvailable()) {
+                                log.error(`[RCL] service {${rcl_service_name}} is not available... check your ROS2 Launch Mode`);
                                 return;
                             };
-                            rosClient.sendRequest(request, (response : any) => {
+                            rcl_client.sendRequest(request, (response : any) => {
                                 try {
-                                    if(response === null) log.error(`[RCL] call {${rosService}} service call has empty response...`);
+                                    if(response === null) log.error(`[RCL] call {${rcl_service_name}} service call has empty response...`);
                                     else {
-                                        const result : string = JSON.stringify(response);
-                                        mqtt.publish(`${rosService}/response`, result);
+                                        if(rcl_service_name.includes("/map_server/map")) {
+                                            const parsed_map_data : Array<number> = Array.from(response.map.data);
+                                            const parsed_map_json : any = {
+                                                map: {
+                                                    header : response.map.header,
+                                                    info : response.map.info,
+                                                    data : parsed_map_data
+                                                }
+                                            };
+                                            const parsed_result : string = JSON.stringify(parsed_map_json);
+                                            mqtt.publish(`${rcl_service_name}/response`, parsed_result);
+                                        } else {
+                                            const result : string = JSON.stringify(response);
+                                            mqtt.publish(`${rcl_service_name}/response`, result);
+                                        }
                                     };
                                 } catch (error : any) {
-                                    log.error(`[RCL] call {${rosService}} : [${error}]`);
+                                    log.error(`[RCL] call {${rcl_service_name}} : [${error}]`);
                                 };
                             });
                         })
@@ -274,7 +284,7 @@ export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, reque
                             throw new Error(error);
                         });
                 } else {
-                    log.error(`[RCL] {${mqttTopic}} is not a service type...`);
+                    log.error(`[RCL] {${mqtt_topic}} is not a service type...`);
                     return;
                 };
             } else return;
@@ -287,15 +297,15 @@ export function requestROSServiceServer(rosClient : rclnodejs.Client<any>, reque
 /**
  * function for parse MQTT message into JSON
  * @see JSON
- * @param mqttMessage : string
+ * @param mqtt_message : string
  * @returns parsedMQTT : any
  */
-function parseMQTT(mqttMessage : string) : any {
-    let parsedMQTT : any = {};
+function parse_mqtt_message_to_json(mqtt_message : string) : any {
+    let parsed_mqtt_json : any = {};
     try {
-        parsedMQTT = JSON.parse(mqttMessage);
+        parsed_mqtt_json = JSON.parse(mqtt_message);
     } catch (error : any) {
         log.error(`[RCL] MQTT-JSON parser throws ${error}`);
     };
-    return parsedMQTT;
+    return parsed_mqtt_json;
 };
