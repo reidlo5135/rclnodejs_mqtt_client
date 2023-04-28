@@ -32,7 +32,7 @@ def generate_launch_description():
     start = os.path.join(
         share_directory,
         'dist/ros2/launch',
-        'jara2.dev.launch.js'
+        'main.js'
     )
 
     start_javascript_node = Node(
