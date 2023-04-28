@@ -42,8 +42,8 @@ class MainLaunch {
                 if(master.spinning) {
                     master.destroy();
                 };
-                const URL_DOODLE : string = 'tcp://localhost:1883';
-                const mqtt : Mqtt = new Mqtt(URL_DOODLE);
+                const MQTT_BROKER_URL : string = 'tcp://localhost:1883';
+                const mqtt : Mqtt = new Mqtt(MQTT_BROKER_URL);
                 this.runRCL(master, mqtt);
                 master.spin();
             })
