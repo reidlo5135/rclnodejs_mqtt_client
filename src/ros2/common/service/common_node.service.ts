@@ -141,9 +141,9 @@ export async function create_rcl_action_client(node : rclnodejs.Node, message_ty
  */
 export function request_to_rcl_action_server(rcl_action_client : rclnodejs.ActionClient<any>, goal : any, topic : string, mqtt : Mqtt) : void {
     log.info(`[RCL] action client {${topic}}, goal : {${goal}}`);
-    const parsed_mqtt_topic : string = topic + '/request';
-    mqtt.subscribe(parsed_mqtt_topic);
     try {
+        const parsed_mqtt_topic : string = topic + '/request';
+        mqtt.subscribe(parsed_mqtt_topic);
         mqtt.client.on('message', (mqtt_topic : string, mqtt_message : any) => {
             const is_topic_equals : boolean = (parsed_mqtt_topic === mqtt_topic);
                         
@@ -234,10 +234,10 @@ export async function create_rcl_service_client(node : rclnodejs.Node, message_t
  */
 export function request_to_rcl_service_server(rcl_client : rclnodejs.Client<any>, request_type : any, topic : string, mqtt : Mqtt) : void {
     log.info(`[RCL] service client {${topic}}, requestType : {${request_type}}`);
-    const request : any = rclnodejs.createMessageObject(request_type);
-    const parsed_mqtt_topic : string = topic + '/request';
-    mqtt.subscribe(parsed_mqtt_topic);
     try {
+        const request : any = rclnodejs.createMessageObject(request_type);
+        const parsed_mqtt_topic : string = topic + '/request';
+        mqtt.subscribe(parsed_mqtt_topic);
         mqtt.client.on('message', (mqtt_topic : string, mqtt_message : any) => {
             const is_topic_equals : boolean = (parsed_mqtt_topic === mqtt_topic);
             
