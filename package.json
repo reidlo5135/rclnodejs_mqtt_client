@@ -6,7 +6,7 @@
   "author": "wavem-reidlo <naru5135@wavem.net>",
   "license": "Apache-2.0",
   "scripts": {
-    "jara2_dev_launch": "nodemon src/ros2/launch/jara2.dev.launch.ts",
+    "main_launch": "nodemon src/ros2/launch/main_launch.ts",
     "build": "tsc"
   },
   "bin": {

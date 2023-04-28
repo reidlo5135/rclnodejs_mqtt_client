@@ -27,7 +27,7 @@ import { create_rcl_publisher, create_rcl_subscription, create_rcl_service_clien
  * @version 1.0.0
  * @since 2023/03/31
 */
-class Jara2Launch {
+class MainLaunch {
 
     /**
      * constructor for create master rcl node & initialize Mqtt class instance & invoke this runRCL
@@ -38,17 +38,17 @@ class Jara2Launch {
     constructor() {
         rclnodejs.init()
             .then(() => {
-                const master : rclnodejs.Node = new rclnodejs.Node('jara2_mqtt_bridge');
+                const master : rclnodejs.Node = new rclnodejs.Node('rclnodejs_mqtt_bridge');
                 if(master.spinning) {
                     master.destroy();
                 };
-                const URL_DOODLE : string = 'tcp://10.223.188.12:1883';
+                const URL_DOODLE : string = 'tcp://localhost:1883';
                 const mqtt : Mqtt = new Mqtt(URL_DOODLE);
                 this.runRCL(master, mqtt);
                 master.spin();
             })
             .catch((err) => {
-                log.error(`[RCL] Jara2Launch ${err}`);
+                log.error(`[RCL] MainLaunch ${err}`);
             });
     };
 
@@ -128,11 +128,11 @@ class Jara2Launch {
 };
 
 /**
- * async function for invoke Jara2Launch class instance
- * @see Jara2Launch
+ * async function for invoke MainLaunch class instance
+ * @see MainLaunch
  */
 async function run() : Promise<void> {
-    new Jara2Launch();
+    new MainLaunch();
 };
 
 /**
