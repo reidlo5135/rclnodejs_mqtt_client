@@ -7,6 +7,7 @@
 ## Document
 - [ROS2-MQTT Client - For ROS2-MQTT connection](#ros2-mqtt-client---for-ros2-mqtt-connection)
   - [Document](#document)
+  - [Environment](#environment)
   - [Installation](#installation)
     - [Prerequisites](#prerequisites)
     - [Installing node(nodejs) \& npm](#installing-nodenodejs--npm)
@@ -14,6 +15,16 @@
   - [Build Project](#build-project)
   - [Generate ROS2 Javascript Message](#generate-ros2-javascript-message)
   - [Launch Client](#launch-client)
+
+## Environment
+* <img src="https://img.shields.io/badge/typescript-3178C6?style=for-the-badge&logo=typescript&logoColor=white">
+* <img src="https://img.shields.io/badge/node.js-339933?style=for-the-badge&logo=node.js&logoColor=white">
+* <img src="https://img.shields.io/badge/nodemon-76D04B?style=for-the-badge&logo=nodemon&logoColor=white">
+* <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white">
+* <img src="https://img.shields.io/badge/cmake-064F8C?style=for-the-badge&logo=cmake&logoColor=white">
+* <img src="https://img.shields.io/badge/mqtt-660066?style=for-the-badge&logo=mqtt&logoColor=white">
+* <img src="https://img.shields.io/badge/ROS2-22314E?style=for-the-badge&logo=ros&logoColor=white">
+* <img src="https://img.shields.io/badge/ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white">
 
 ## Installation
 
@@ -74,7 +85,7 @@ Clone proejct into your own directories
 ```bash
 mkdir ${your directory} && cd ${your directory}
 
-git clone -b JaraTwo_Release_v1.0.0 https://github.com/WaveM-Robot/MqttClient.git
+git clone https://github.com/WaveM-Robot/MqttClient.git
 ```
 
 ## Build Project
@@ -135,7 +146,7 @@ const message = rclnodejs.createMessageObject('${installed message type}');
 Launch ROS2-MQTT Client
 
 ```bash
-ros2 launch ros2_mqtt_client overall.launch.py
+ros2 launch ros2_mqtt_client mqtt_bridge.launch.py
 ```
 Launch Result Console
 
