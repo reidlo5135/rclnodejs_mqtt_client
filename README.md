@@ -36,6 +36,8 @@ Before installing, please ensure the following softare is installed and configur
   
 - [nodejs](https://nodejs.org/en/) version required between 10.23.1 - 12.x.
 
+- [mosquitto](https://mosquitto.org/) for use mqtt broker - **INSTALL [mosquitto](https://mosquitto.org/)**
+
 - [ROS2 setup](https://index.ros.org/doc/ros2/Installation/) for install rclnodejs by npm -
   **INSTALL [ROS2 Foxy-Fitzroy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)**
 
@@ -85,7 +87,7 @@ Clone proejct into your own directories
 ```bash
 mkdir ${your directory} && cd ${your directory}
 
-git clone https://github.com/WaveM-Robot/MqttClient.git
+git clone https://github.com/reidlo5135/rclnodejs_mqtt_client.git
 ```
 
 ## Build Project
@@ -95,7 +97,7 @@ Before usage install node modules & build project
 For the install required node modules
 
 ```bash
-cd ${your directory}/ros2_mqtt_client
+cd ${your directory}/rclnodejs_mqtt_client
 
 npm i
 ```
@@ -146,7 +148,7 @@ const message = rclnodejs.createMessageObject('${installed message type}');
 Launch ROS2-MQTT Client
 
 ```bash
-ros2 launch ros2_mqtt_client mqtt_bridge.launch.py
+ros2 launch rclnodejs_mqtt_client mqtt_bridge.launch.py
 ```
 Launch Result Console
 
