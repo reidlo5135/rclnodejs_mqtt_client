@@ -48,13 +48,13 @@ Install the node(nodejs) & npm into your Linux(Ubuntu 20.0.4LTS)
 For the most current version of nodejs :
 
 ```bash
-sudo install nodejs
+sudo apt-get install nodejs
 ```
 
 For the most current version of npm(node package manager) :
 
 ```bash
-sudo install npm -g
+sudo apt-get install npm -g
 ```
 
 Install node(nodejs) & npm latest version by n :
