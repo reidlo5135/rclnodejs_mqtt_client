@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ros2_mqtt_client)
+project(rclnodejs_mqtt_client)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
