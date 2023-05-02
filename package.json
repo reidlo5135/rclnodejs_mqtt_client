@@ -1,5 +1,5 @@
 {
-  "name": "ros2_mqtt_client",
+  "name": "rclnodejs_mqtt_client",
   "version": "1.0.0",
   "description": "ROS2-MQTT Client",
   "keywords": [],
