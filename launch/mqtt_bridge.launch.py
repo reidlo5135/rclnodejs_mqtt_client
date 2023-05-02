@@ -27,12 +27,12 @@ def generate_launch_description():
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
-    share_directory = get_package_share_directory('ros2_mqtt_client')
+    share_directory = get_package_share_directory('rclnodejs_mqtt_client')
 
     start = os.path.join(
         share_directory,
         'dist/ros2/launch',
-        'main.js'
+        'main.launch.js'
     )
 
     start_javascript_node = Node(
