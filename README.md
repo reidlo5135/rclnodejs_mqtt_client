@@ -1,4 +1,4 @@
-# rclnodejs-MQTT bridge client
+# rclnodejs-mqtt bridge client
 
 [![npm-rclnodejs](https://img.shields.io/npm/v/rclnodejs.svg)](https://www.npmjs.com/package/rclnodejs)
 [![node](https://img.shields.io/node/v/rclnodejs.svg)](https://nodejs.org/en/download/releases/)
