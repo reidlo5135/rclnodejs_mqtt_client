@@ -131,7 +131,7 @@ source install/setup.bash
 For generate & apply new message type after install new message type that you want to use
 
 ```bash
-npx generate-ros-message
+npx generate-ros-messages
 npm i
 ```
 
