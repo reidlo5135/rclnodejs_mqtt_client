@@ -93,7 +93,7 @@ export async function create_rcl_publisher(node : rclnodejs.Node, message_type :
                     const is_message_publisher_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.pub);
 
                     if(is_message_publisher_type) {
-                        log.info(`[RCL] publihser topic ${topic}, mqttTopic : ${mqttTopic}`);
+                        log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
                         log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
                         rcl_publisher.publish(parsed_mqtt.data);
                     } else {
@@ -163,7 +163,6 @@ export function request_to_rcl_action_server(rcl_action_client : rclnodejs.Actio
                                 rcl_action_client.sendGoal(goal, (feedback : any) => {
                                     try {
                                         const feedback_message : string = JSON.stringify(feedback);
-                                        // log.info(`[RCL] action server goalHandle feedback : {${feedbackMessage}}`);
                                         mqtt.publish(`${topic}/feedback`, feedback_message);
                                     } catch (error : any) {
                                         log.error(`[RCL] action server feedback ${error}`);
