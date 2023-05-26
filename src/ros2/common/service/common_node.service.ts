@@ -87,11 +87,11 @@ export async function create_rcl_publisher(node : rclnodejs.Node, message_type :
         mqtt.client.on('message', (mqttTopic : string, mqttMessage : any) => {
             try {
                 const is_topic_equals : boolean = (topic === mqttTopic);
-                                                
+
                 if(is_topic_equals) {
                     const parsed_mqtt : any = parse_mqtt_message_to_json(mqttMessage.toString());
                     const is_message_publisher_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.pub);
-
+                    
                     if(is_message_publisher_type) {
                         log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
                         log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
