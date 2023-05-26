@@ -14,6 +14,7 @@
 
 'strict mode';
 
+import { exec } from 'child_process';
 import { IPublishPacket } from 'mqtt';
 import * as rclnodejs from 'rclnodejs';
 import Mqtt from "../../mqtt/service/mqtt.service";
@@ -63,9 +64,11 @@ class MainLaunch {
      */
     private runRCL(master : rclnodejs.Node, mqtt : Mqtt) : void {
         const default_topic : string = 'ros_message_init';
+        const nuc_shutdown_topic : string = "nuc_shutdown";
         try {
             mqtt.unsubscribe_after_connection_check(default_topic);
             mqtt.subscribe(default_topic);
+            mqtt.subscribe(nuc_shutdown_topic);
         } catch (error : any) {
             log.error(`[MQTT] default topic : ${error}`);
         };
@@ -78,40 +81,42 @@ class MainLaunch {
         };
 
         mqtt.client.on('message', (mqtt_topic : string, mqtt_message : string, mqtt_packet : IPublishPacket) : void => {
-            const is_mqtt_message_init : boolean = (mqtt_packet.topic === default_topic);
-            if(is_mqtt_message_init) {
+            const is_mqtt_ros_message_init : boolean = (mqtt_packet.topic === default_topic);
+            const is_mqtt_nuc_shutdown : boolean = (mqtt_packet.topic === nuc_shutdown_topic);
+
+            if(is_mqtt_ros_message_init) {
                 try {
-                    const json = JSON.parse(mqtt_message);
+                    const ros_connections = JSON.parse(mqtt_message);
                     
-                    for(let raw of json) {
-                        if(raw.type === mqtt_request_type.sub)  {
-                            create_rcl_subscription(master, raw.message_type, raw.name, mqtt)
+                    for(let ros_connection of ros_connections) {
+                        if(ros_connection.type === mqtt_request_type.sub)  {
+                            create_rcl_subscription(master, ros_connection.message_type, ros_connection.name, mqtt)
                                 .then(() => {
-                                    log.info(`[RCL] {${raw.name}} subscription created`);
+                                    log.info(`[RCL] {${ros_connection.name}} subscription created`);
                                 })
                                 .catch((error : Error) => {
-                                    log.error(`[RCL] {${raw.name}} subscription throws : ${error}`);
+                                    log.error(`[RCL] {${ros_connection.name}} subscription throws : ${error}`);
                                 });
-                        } else if(raw.type === mqtt_request_type.pub) {
-                            create_rcl_publisher(master, raw.message_type, raw.name, mqtt)
+                        } else if(ros_connection.type === mqtt_request_type.pub) {
+                            create_rcl_publisher(master, ros_connection.message_type, ros_connection.name, mqtt)
                                 .then(() => {
-                                    log.info(`[RCL] {${raw.name}} publisher created`);
+                                    log.info(`[RCL] {${ros_connection.name}} publisher created`);
                                 })
                                 .catch((error : Error) => {
-                                    log.error(`[RCL] {${raw.name}} publisher throws : ${error}`);
+                                    log.error(`[RCL] {${ros_connection.name}} publisher throws : ${error}`);
                                 });
-                        } else if(raw.type === mqtt_request_type.action) {
-                            create_rcl_action_client(master, raw.message_type, raw.name)
+                        } else if(ros_connection.type === mqtt_request_type.action) {
+                            create_rcl_action_client(master, ros_connection.message_type, ros_connection.name)
                                 .then((client) => {
-                                    request_to_rcl_action_server(client!, raw.request_type, raw.name, mqtt);
+                                    request_to_rcl_action_server(client!, ros_connection.request_type, ros_connection.name, mqtt);
                                 })
                                 .catch((error) => {
                                     log.error(`[RCL] request action client [${error}]`);
                                 });
-                        } else if(raw.type === mqtt_request_type.service) {
-                            create_rcl_service_client(master, raw.message_type, raw.name)
+                        } else if(ros_connection.type === mqtt_request_type.service) {
+                            create_rcl_service_client(master, ros_connection.message_type, ros_connection.name)
                                 .then((client) => {
-                                    request_to_rcl_service_server(client!, raw.request_type, raw.name, mqtt);
+                                    request_to_rcl_service_server(client!, ros_connection.request_type, ros_connection.name, mqtt);
                                 })
                                 .catch((error) => {
                                     log.error(`[RCL] service client [${error}]`);
@@ -122,6 +127,19 @@ class MainLaunch {
                     log.error(`[RCL] ros_message_init : [${error}]`);
                     throw new Error(error);
                 };
+            } else if(is_mqtt_nuc_shutdown) {
+                const nuc_shutdown_command : string = "sudo shutdown -h now";
+                try {
+                    exec(nuc_shutdown_command, (error, stdout, stderr) => {
+                        if(error) {
+                            log.error(`[RCL] NUC shutdown error : ${error}` );
+                            return;
+                        }
+                        log.info(`[RCL] Command executed successfully. Output : ${stdout}`);
+                    });
+                } catch(error : any) {
+                    log.error(`[RCL] NUC shutdwon error : ${JSON.stringify(error)}`);
+                }
             } else return;
         });
     };
