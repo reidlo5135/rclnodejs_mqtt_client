@@ -100,11 +100,20 @@ export async function create_rcl_publisher(node : rclnodejs.Node, message_type :
                 if(is_topic_equals) {
                     const parsed_mqtt : any = parse_mqtt_message_to_json(mqttMessage.toString());
                     const is_message_publisher_type : boolean = (parsed_mqtt.mode === mqtt_rcl_request_type.pub);
-                    
+
                     if(is_message_publisher_type) {
-                        log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
-                        log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
-                        rcl_publisher.publish(parsed_mqtt.data);
+                        if(topic === '/gps_manual_move/request') {
+                            const gps_manaual_move_request = rclnodejs.createMessageObject('manual_move_msgs/msg/GpsMoveRequest');
+                            gps_manaual_move_request.header.frame_id = 'manual_move_request';
+                            gps_manaual_move_request.waypoints_list = parsed_mqtt.data.waypoints_list;
+                            log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
+                            log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
+                            rcl_publisher.publish(gps_manaual_move_request);
+                        } else {
+                            log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
+                            log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
+                            rcl_publisher.publish(parsed_mqtt.data);
+                        }
                     } else {
                         return;
                     };
