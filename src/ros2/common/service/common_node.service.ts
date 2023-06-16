@@ -57,6 +57,15 @@ export async function create_rcl_subscription(node : rclnodejs.Node, message_typ
                     const error : string = `[RCL] {${topic}} subscription has return empty message...`;
                     log.error(error);
                     throw new Error(error);
+                } else if(topic === '/map') {
+                    const parsed_map_data : Array<number> = Array.from(message.data);
+                    const parsed_map_json : any = {
+                            header : message.header,
+                            info : message.info,
+                            data : parsed_map_data
+                    }
+                    const parsed_result : string = JSON.stringify(parsed_map_json);
+                    mqtt.publish(topic, parsed_result);
                 } else {
                     mqtt.publish(topic, JSON.stringify(message));
                 };
