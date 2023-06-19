@@ -103,12 +103,36 @@ export async function create_rcl_publisher(node : rclnodejs.Node, message_type :
 
                     if(is_message_publisher_type) {
                         if(topic === '/gps_manual_move/request') {
-                            const gps_manaual_move_request = rclnodejs.createMessageObject('manual_move_msgs/msg/GpsMoveRequest');
-                            gps_manaual_move_request.header.frame_id = 'manual_move_request';
-                            gps_manaual_move_request.waypoints_list = parsed_mqtt.data.waypoints_list;
+                            const gps_waypoints_list : any = parsed_mqtt.data.waypoints_list;
+
+                            for(let i=0;i<gps_waypoints_list.length;i++) {
+                                gps_waypoints_list[i].header.frame_id = "base_gps";
+                                log.info(`[RCL] gps_waypoints_list ${JSON.stringify(gps_waypoints_list[i].header)}`);
+                            }
+
+                            const gps_message = rclnodejs.createMessageObject('manual_move_msgs/msg/GpsMoveRequest');
+                            const gps_waypoints = rclnodejs.createMessageObject('geometry_msgs/msg/PoseStamped');
+                            const gps_points = rclnodejs.createMessageObject('geometry_msgs/msg/Point');
+                            const builtin_time = rclnodejs.createMessageObject('builtin_interfaces/msg/Time');
+                            gps_message.header.frame_id = "base_gps_link";
+                            const currentTime = new Date();
+                            builtin_time.sec = Math.floor(currentTime.getTime() / 1000);
+                            builtin_time.nanosec = (currentTime.getTime() % 1000) * 1e6;
+                            gps_message.header.stamp.sec = builtin_time.sec;
+                            gps_message.header.stamp.nanosec = builtin_time.nanosec;
+                            gps_points.x = 0.0;
+                            gps_points.y = 0.0;
+                            gps_points.z = 0.0;
+                            gps_waypoints.header.frame_id = "child_gps";
+                            gps_waypoints.header.stamp.sec = builtin_time.sec;
+                            gps_waypoints.header.stamp.nanosec = builtin_time.nanosec;
+                            gps_waypoints.pose.position = gps_points;
+                            gps_message.waypoints = gps_waypoints;
+                            gps_message.waypoints_list = gps_waypoints_list;
+
                             log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
-                            log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
-                            rcl_publisher.publish(gps_manaual_move_request);
+                            log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(gps_message)}`);
+                            rcl_publisher.publish(gps_message);
                         } else {
                             log.info(`[RCL] publisher topic ${topic}, mqttTopic : ${mqttTopic}`);
                             log.info(`[RCL] {${topic}} publishing data : ${JSON.stringify(parsed_mqtt.data)}`);
